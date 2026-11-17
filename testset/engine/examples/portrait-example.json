@@ -1,0 +1,22 @@
+{
+  "film": {
+    "iso": 400,
+    "type": "color_negative"
+  },
+  "light": {
+    "kind": "daylight",
+    "sky": "sun_behind_clouds",
+    "scene": "open"
+  },
+  "subject": "portrait",
+  "goal": "blur",
+  "lowSun": true,
+  "camera": {
+    "widestAperture": "2.8",
+    "smallestAperture": "22",
+    "focalLengthMm": 40,
+    "fastestShutter": "1/250",
+    "slowestShutter": "1/15",
+    "hasBulb": true
+  }
+}

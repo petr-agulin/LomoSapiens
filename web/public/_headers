@@ -1,0 +1,23 @@
+# Security headers for Cloudflare Pages. Cloudflare reads this file from the built app's
+# root and adds these headers to its answers. Checked by web/src/lib/headers.test.ts.
+#
+# Content-Security-Policy: the app may load and contact nothing but its own address. Exceptions, all on the phone:
+# blob: shows a frame's photo kept in the browser; data: reads the photos inside a backup file while restoring it.
+# Styles allow 'unsafe-inline' for the style block in index.html and the few styles set in the code; scripts don't.
+# Permissions-Policy: no location and no microphone. The camera is left alone: photos are
+# taken through the phone's own file picker.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self' data:; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  X-Frame-Options: DENY
+  Permissions-Policy: geolocation=(), microphone=(), payment=(), usb=()
+
+# The offline support checks for updates on every visit, so a new version reaches phones at their next opening.
+/sw.js
+  Cache-Control: no-cache
+
+# The app's own files have their content's fingerprint in their names, so a browser may keep them for good.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

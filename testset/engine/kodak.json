@@ -1,0 +1,63 @@
+{
+  "source": "docs/ENGINE_SPEC.md section 13.2, from Kodak Ultra Max 400, publication E-7023.",
+  "note": "All at ISO 400, on a surface, so only the light decides. lightNumber is the light the app must give. kodakAperture and kodakShutter are Kodak's own setting, compared on the fast test camera, which has 1/500. Kodak's row names are from the data sheet's daylight table.",
+  "rows": [
+    {
+      "kodak": "Bright/hazy sun on light sand or snow",
+      "light": { "kind": "daylight", "sky": "sun", "scene": "snow_sand" },
+      "subject": "group",
+      "lightNumber": 17,
+      "kodakAperture": "16",
+      "kodakShutter": "1/500"
+    },
+    {
+      "kodak": "Bright or hazy sun, distinct shadows",
+      "light": { "kind": "daylight", "sky": "sun", "scene": "open" },
+      "subject": "group",
+      "lightNumber": 16,
+      "kodakAperture": "11",
+      "kodakShutter": "1/500"
+    },
+    {
+      "kodak": "Weak, hazy sun, soft shadows",
+      "light": { "kind": "daylight", "sky": "sun_haze", "scene": "open" },
+      "subject": "group",
+      "lightNumber": 15,
+      "kodakAperture": "8",
+      "kodakShutter": "1/500"
+    },
+    {
+      "kodak": "Cloudy bright, no shadows",
+      "light": { "kind": "daylight", "sky": "sun_behind_clouds", "scene": "open" },
+      "subject": "group",
+      "lightNumber": 14,
+      "kodakAperture": "5.6",
+      "kodakShutter": "1/500"
+    },
+    {
+      "kodak": "Heavy overcast",
+      "light": { "kind": "daylight", "sky": "overcast", "scene": "open" },
+      "subject": "group",
+      "lightNumber": 13,
+      "kodakAperture": "4",
+      "kodakShutter": "1/500"
+    },
+    {
+      "kodak": "Open shade",
+      "light": { "kind": "daylight", "sky": "sun", "scene": "under_trees" },
+      "subject": "group",
+      "lightNumber": 13,
+      "kodakAperture": "4",
+      "kodakShutter": "1/500"
+    },
+    {
+      "kodak": "Backlit close-up subjects, in bright sun",
+      "light": { "kind": "daylight", "sky": "sun", "scene": "open" },
+      "subject": "portrait",
+      "sunBehindSubject": true,
+      "lightNumber": 14,
+      "kodakAperture": "5.6",
+      "kodakShutter": "1/500"
+    }
+  ]
+}

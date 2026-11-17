@@ -1,0 +1,271 @@
+@import "tailwindcss";
+
+/* The design's tokens. Light or dark as the phone is set, unless a theme is picked in
+   Settings: `data-theme` on the page then holds it (src/lib/theme.ts): light, dark,
+   or archive, the Archive paper theme, which overrides these below.
+   The fonts are declared in index.html, because they ship with the app in public/fonts. */
+:root {
+  color-scheme: light dark;
+  --bg: #f2f2ef;
+  --card: #ffffff;
+  --ink: #111113;
+  --muted: #6b6b70;
+  --line: #dcdcd6;
+  --chip: #f2f2ef;
+  --hero: #121214; /* film strip and every selected element */
+  --hero-ink: #ffffff;
+  --hero-line: rgba(255, 255, 255, 0.16);
+  --accent: #ff6a3d; /* coral: the sharp zone only */
+  --scale: #b4b4ae;
+  --info: #2051e8; /* "Values are estimated" */
+  --info-soft: #e2e8fd;
+  --info-line: #9fb3f5;
+  --warn-soft: #fbefd4;
+  --warn-ink: #8a5a00;
+  --edge-ink: #e8a23e; /* the film print on Home, a design element */
+  --scrim: rgba(0, 0, 0, 0.4);
+  --sheet-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
+  --on-hero-icon-bg: rgba(127, 127, 127, 0.22);
+  /* Shapes and the few colours that used to be written into the screens, so a look can change them. */
+  --card-radius: 20px;
+  --sheet-radius: 24px;
+  --card-shadow: 0 0 #0000; /* none */
+  --hero-tile: rgba(127, 127, 127, 0.16); /* a Theory picture's tiles */
+  --knob: #ffffff; /* a switch's knob, when off */
+  --accent-zone: rgba(255, 106, 61, 0.22); /* the sharp zone's band */
+  --hero-filter: none; /* Home's figures, drawn in black */
+  /* A second button on the page itself, such as "Record this shot": raised, white in light, like the round buttons;
+     the quiet surface in dark. */
+  --page-button: var(--card);
+  --page-button-shadow: 0 0 #0000; /* none */
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Dark, picked in Settings. The same colours as for a dark phone below: src/lib/theme.test.ts checks they match. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c0c0d;
+  --card: #1b1b1e;
+  --ink: #f4f4f2;
+  --muted: #a3a3a8;
+  --line: #2e2e32;
+  --chip: #2c2c31;
+  --hero: #f4f4f2;
+  --hero-ink: #111113;
+  --hero-line: rgba(0, 0, 0, 0.14);
+  --accent: #ff7a4f;
+  --scale: #55555b;
+  --info: #8aa8ff;
+  --info-soft: #1b2442;
+  --info-line: #3d4f8f;
+  --warn-soft: #33270f;
+  --warn-ink: #f2b84b;
+  --edge-ink: #9a5a10;
+  --hero-filter: invert(1) brightness(0.96);
+  --page-button: var(--chip);
+}
+
+/* A dark phone, with no theme picked. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #0c0c0d;
+    --card: #1b1b1e;
+    --ink: #f4f4f2;
+    --muted: #a3a3a8;
+    --line: #2e2e32;
+    --chip: #2c2c31;
+    --hero: #f4f4f2;
+    --hero-ink: #111113;
+    --hero-line: rgba(0, 0, 0, 0.14);
+    --accent: #ff7a4f;
+    --scale: #55555b;
+    --info: #8aa8ff;
+    --info-soft: #1b2442;
+    --info-line: #3d4f8f;
+    --warn-soft: #33270f;
+    --warn-ink: #f2b84b;
+    --edge-ink: #9a5a10;
+    --hero-filter: invert(1) brightness(0.96);
+    --page-button: var(--chip);
+  }
+}
+
+/* Archive paper, the third theme: aged paper
+   instead of grey, lighter paper cards, sepia-brown ink, a dark-brown film strip, paper corners and shadows, and a
+   paper layer on top. Always light: the phone's dark setting doesn't apply while it is picked. */
+:root[data-theme="archive"] {
+  color-scheme: light;
+  --bg: #e8dcc2;
+  --card: #f3e9d4;
+  --ink: #3a2817;
+  --muted: #6e5740; /* the pair with least room: 4.8:1 on --chip. Don't lighten */
+  --line: #cfbd99;
+  --chip: #e6d8bb;
+  --hero: #3f2a18;
+  --hero-ink: #f4e6c8;
+  --hero-line: rgba(244, 230, 200, 0.2);
+  --accent: #a94a22; /* rust: the sharp zone only */
+  --scale: #957d5b;
+  --info: #2c4a78; /* blue-black ink, like a stamp */
+  --info-soft: #e3dccb;
+  --info-line: #8c9bb4;
+  --warn-soft: #ecd29c;
+  --warn-ink: #6e4208;
+  --edge-ink: #d89a4a;
+  --scrim: rgba(40, 24, 10, 0.42);
+  --sheet-shadow: 0 -8px 30px rgba(60, 35, 15, 0.22);
+  --on-hero-icon-bg: rgba(244, 230, 200, 0.16);
+  --card-radius: 14px; /* paper is less rounded */
+  --sheet-radius: 18px;
+  --card-shadow: 0 1px 0 rgba(90, 60, 30, 0.12), 0 6px 14px rgba(90, 60, 30, 0.1);
+  --hero-tile: rgba(244, 230, 200, 0.12);
+  --knob: #fbf5e8;
+  --accent-zone: rgba(169, 74, 34, 0.22);
+  --hero-filter: invert(0.2) sepia(1) saturate(1.6) hue-rotate(-12deg) brightness(0.82);
+  /* On paper the quiet surface is all but the page's colour, so a second button on the page is raised paper,
+     like the round buttons and the cards, with their shadow. */
+  --page-button: var(--card);
+  --page-button-shadow: var(--card-shadow);
+}
+
+/* Archive paper: the typewriter face for all text, titles, buttons and articles too.
+   These rules sit outside Tailwind's layers, so they win over its
+   classes. The face has one weight: bold text is thickened by the browser, like a heavier strike. */
+:root[data-theme="archive"] body,
+:root[data-theme="archive"] .font-display {
+  font-family: "Special Elite", "Courier New", monospace;
+}
+
+/* Except the numbers read while setting the camera (the `type-number` hook): the film strips, the focus distance
+   and its scale, the sharp zone, and values as the camera marks them. They keep the crisp face, as in the other
+   themes, to be read at a glance in bright light. */
+:root[data-theme="archive"] :is(.type-number, .type-number *) {
+  font-family: "Inter Tight", "Inter", system-ui, sans-serif;
+}
+
+/* The small labels, such as section labels and crumbs: one pixel up from 13 px, as the face runs small. */
+:root[data-theme="archive"] .type-label {
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* Archive paper, Home only: the last shot's strip mounted like a negative in an album, slightly askew, with photo
+   corners. The result's strip stays straight: its numbers are read while setting the camera. */
+.photo-corner {
+  display: none;
+}
+:root[data-theme="archive"] .album-strip {
+  position: relative;
+  border-radius: 3px;
+  transform: rotate(-0.8deg);
+  box-shadow: 0 2px 4px rgba(60, 35, 15, 0.25);
+}
+:root[data-theme="archive"] .album-strip .photo-corner {
+  display: block;
+  position: absolute;
+  width: 18px;
+  height: 18px;
+}
+:root[data-theme="archive"] .photo-corner.tl {
+  top: -4px;
+  left: -4px;
+  background: linear-gradient(135deg, #2b1c10 50%, transparent 50%);
+}
+:root[data-theme="archive"] .photo-corner.tr {
+  top: -4px;
+  right: -4px;
+  background: linear-gradient(225deg, #2b1c10 50%, transparent 50%);
+}
+:root[data-theme="archive"] .photo-corner.bl {
+  bottom: -4px;
+  left: -4px;
+  background: linear-gradient(45deg, #2b1c10 50%, transparent 50%);
+}
+:root[data-theme="archive"] .photo-corner.br {
+  bottom: -4px;
+  right: -4px;
+  background: linear-gradient(315deg, #2b1c10 50%, transparent 50%);
+}
+
+/* Archive paper: the paper layer (components/app/PaperLayer.tsx). One element above everything, sheets included,
+   fixed so content scrolls under it like a print, and never catching taps. The blend goes on the wrapper: its
+   z-index makes it its own stacking context, so a blend on the layers inside would only blend them together. */
+.paper-fx {
+  display: none;
+}
+:root[data-theme="archive"] .paper-fx {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+.paper-fx > span {
+  position: absolute;
+  inset: 0;
+}
+.paper-fx__crumple {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+}
+.paper-fx__grain {
+  background-position: 0 0;
+  background-size: 128px 128px;
+  background-repeat: repeat;
+  opacity: 0.22;
+}
+.paper-fx__leak {
+  /* A warm light leak from the top right corner, like light fogging the end of a roll. */
+  background: radial-gradient(circle at 104% -4%, rgba(214, 96, 38, 0.38), rgba(236, 160, 70, 0.18) 26%, rgba(236, 160, 70, 0) 52%);
+}
+.paper-fx__vignette {
+  /* Darker edges, like an old print. Kept at .2, so muted text near the edges stays readable. */
+  background: radial-gradient(ellipse 85% 75% at 50% 45%, rgba(80, 50, 20, 0) 62%, rgba(80, 50, 20, 0.2) 100%);
+}
+/* People who ask for less visual noise get the colours without the paper layer. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root[data-theme="archive"] .paper-fx {
+    display: none;
+  }
+}
+
+/* Tailwind names for the tokens: bg-card, text-muted, bg-hero and so on. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-chip: var(--chip);
+  --color-hero: var(--hero);
+  --color-hero-ink: var(--hero-ink);
+  --color-hero-line: var(--hero-line);
+  --color-accent: var(--accent);
+  --color-scale: var(--scale);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-line: var(--info-line);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-ink: var(--warn-ink);
+  --color-edge-ink: var(--edge-ink);
+  --font-display: "Inter Tight", "Inter", system-ui, sans-serif;
+  --font-text: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+}

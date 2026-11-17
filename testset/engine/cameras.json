@@ -1,0 +1,53 @@
+{
+  "source": "docs/ENGINE_SPEC.md section 1a. Made-up test cameras, described only by their limits: compact, a 40 mm f/2.8 camera; fast, a 50 mm f/1.4 one; then half, slow, dim and box.",
+  "cameras": {
+    "compact": {
+      "widestAperture": "2.8",
+      "smallestAperture": "22",
+      "focalLengthMm": 40,
+      "fastestShutter": "1/250",
+      "slowestShutter": "1/15",
+      "hasBulb": true
+    },
+    "fast": {
+      "widestAperture": "1.4",
+      "smallestAperture": "22",
+      "focalLengthMm": 50,
+      "fastestShutter": "1/1000",
+      "slowestShutter": "1",
+      "hasBulb": true
+    },
+    "half": {
+      "widestAperture": "1.8",
+      "smallestAperture": "22",
+      "focalLengthMm": 50,
+      "fastestShutter": "1/500",
+      "slowestShutter": "1",
+      "hasBulb": false
+    },
+    "slow": {
+      "widestAperture": "3.5",
+      "smallestAperture": "16",
+      "focalLengthMm": 50,
+      "fastestShutter": "1/500",
+      "slowestShutter": "1/30",
+      "hasBulb": true
+    },
+    "dim": {
+      "widestAperture": "4.5",
+      "smallestAperture": "22",
+      "focalLengthMm": 40,
+      "fastestShutter": "1/250",
+      "slowestShutter": "1/30",
+      "hasBulb": true
+    },
+    "box": {
+      "widestAperture": "5.6",
+      "smallestAperture": "11",
+      "focalLengthMm": 40,
+      "fastestShutter": "1/125",
+      "slowestShutter": "1/60",
+      "hasBulb": false
+    }
+  }
+}

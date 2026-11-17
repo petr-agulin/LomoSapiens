@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "conditions.schema.json",
+  "title": "Conditions",
+  "description": "What the engine needs to know about a shot and the user's camera. See docs/ENGINE_SPEC.md sections 1 and 1a.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["film", "light", "subject", "camera"],
+  "properties": {
+    "film": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["iso", "type"],
+      "properties": {
+        "iso": { "type": "number", "exclusiveMinimum": 0 },
+        "type": { "enum": ["color_negative", "bw_negative", "slide"] }
+      }
+    },
+    "light": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "sky", "scene"],
+          "properties": {
+            "kind": { "const": "daylight" },
+            "sky": { "enum": ["sun", "sun_haze", "sun_behind_clouds", "overcast", "storm"] },
+            "scene": { "enum": ["snow_sand", "open", "under_trees"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "lowlight"],
+          "properties": {
+            "kind": { "const": "lowlight" },
+            "lowlight": {
+              "enum": ["sun_low", "sun_just_set", "dusk", "street_night", "home_lamps", "floodlit"]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "indoor"],
+          "properties": {
+            "kind": { "const": "indoors" },
+            "indoor": { "enum": ["window", "room", "lamps", "office"] },
+            "sky": { "enum": ["sun", "sun_haze", "sun_behind_clouds", "overcast", "storm", null] }
+          }
+        }
+      ]
+    },
+    "subject": { "enum": ["portrait", "two_people", "group", "landscape", "other"] },
+    "subjectDistanceM": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+    "goal": { "enum": ["blur", "sharp", "moving"] },
+    "lowSun": { "type": "boolean" },
+    "sunBehindSubject": { "type": "boolean" },
+    "sunAhead": { "type": "boolean" },
+    "support": { "enum": ["hand", "braced", "surface", null] },
+    "camera": {
+      "description": "The user's own camera, read off the camera itself. No camera list.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["widestAperture", "smallestAperture", "focalLengthMm", "fastestShutter", "slowestShutter", "hasBulb"],
+      "properties": {
+        "widestAperture": { "enum": ["1.4", "1.7", "1.8", "2", "2.8", "3.5", "4", "4.5", "5.6"] },
+        "smallestAperture": { "enum": ["11", "16", "22", "32"] },
+        "focalLengthMm": { "type": "number", "minimum": 28, "maximum": 58 },
+        "fastestShutter": { "enum": ["1/125", "1/250", "1/500", "1/1000", "1/2000"] },
+        "slowestShutter": { "enum": ["1", "1/2", "1/4", "1/8", "1/15", "1/30", "1/60"] },
+        "hasBulb": { "type": "boolean" }
+      }
+    }
+  },
+  "if": {
+    "required": ["subject"],
+    "properties": { "subject": { "const": "other" } }
+  },
+  "then": {
+    "required": ["subjectDistanceM"],
+    "properties": { "subjectDistanceM": { "type": "number" } }
+  }
+}

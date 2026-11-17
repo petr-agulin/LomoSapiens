@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "parse.schema.json",
+  "title": "ParseResult",
+  "description": "What the AI may return for a description. It holds conditions only: no field can carry a recommended setting or a location.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind"],
+  "properties": {
+    "kind": { "enum": ["new_shot", "what_if", "question", "camera_howto", "out_of_scope"] },
+    "conditions": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "film": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "iso": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+            "type": { "enum": ["color_negative", "bw_negative", "slide", null] }
+          }
+        },
+        "light": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "enum": ["daylight", "lowlight", null] },
+            "sky": { "enum": ["sun", "sun_haze", "sun_behind_clouds", "overcast", "storm", null] },
+            "scene": { "enum": ["snow_sand", "open", "under_trees", "indoor_window", "indoor_room", "indoor_lamps", "indoor_office", null] },
+            "lowlight": { "enum": ["sun_low", "sun_just_set", "dusk", "street_night", "home_lamps", "floodlit", null] }
+          }
+        },
+        "subject": { "enum": ["portrait", "two_people", "group", "landscape", "other", null] },
+        "subjectDistanceM": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+        "goal": { "enum": ["blur", "sharp", "moving", null] },
+        "lowSun": { "type": ["boolean", "null"] },
+        "sunBehindSubject": { "type": ["boolean", "null"] },
+        "sunAhead": { "type": ["boolean", "null"] },
+        "support": { "enum": ["hand", "braced", "surface", null] }
+      }
+    },
+    "whatIf": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "aperture": { "enum": ["1.4", "1.7", "1.8", "2", "2.8", "3.5", "4", "4.5", "5.6", "8", "11", "16", "22", "32", null] },
+        "shutter": {
+          "enum": ["B", "1", "1/2", "1/4", "1/8", "1/15", "1/30", "1/60", "1/125", "1/250", "1/500", "1/1000", "1/2000", null]
+        },
+        "focusM": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+        "support": { "enum": ["hand", "braced", "surface", null] }
+      }
+    },
+    "question": { "type": ["string", "null"] },
+    "missing": { "type": "array", "items": { "type": "string" } },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "why"],
+        "properties": {
+          "field": { "type": "string" },
+          "value": {},
+          "why": { "type": "string" }
+        }
+      }
+    }
+  }
+}

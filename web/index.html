@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f2f2ef" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0c0d" media="(prefers-color-scheme: dark)" />
+    <!-- The theme picked in Settings, set before the page first draws (public/theme.js). Left as it is by the build. -->
+    <script src="./theme.js" vite-ignore></script>
+    <meta name="description" content="Set your manual film camera for the best shot." />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon-192.png" type="image/png" />
+    <!-- The fonts ship with the app (public/fonts, SIL Open Font License), so it works offline and asks no font
+         server. The paths are relative to the page, so they also work when the app sits in a folder. -->
+    <link rel="preload" href="./fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 400 600;
+        font-display: swap;
+        src: url("./fonts/inter-latin.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Inter Tight";
+        font-style: normal;
+        font-weight: 500 700;
+        font-display: swap;
+        src: url("./fonts/inter-tight-latin.woff2") format("woff2");
+      }
+      /* The typewriter face of the Archive paper look, for small labels only (Apache License 2.0). Loaded only when used. */
+      @font-face {
+        font-family: "Special Elite";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("./fonts/special-elite-latin.woff2") format("woff2");
+      }
+    </style>
+    <title>LomoSapiens</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,305 @@
+{
+  "source": "A small starter set: descriptions, and the conditions the AI should read from them.",
+  "note": "Each sampleReply is written by hand to the prompt's shape, not recorded from a real model. These tests prove the app handles a correct reply properly. They don't prove the model gives one: type each utterance into the test page for that.",
+  "cases": [
+    {
+      "id": "portrait example",
+      "utterance": "winter in Sweden, 14:00, overcast, the sun is almost gone but slightly behind clouds, shooting a portrait, the person is outside, a house 20 metres behind, I want a sharp portrait and blurred background, Kodak UltraMax 400",
+      "sampleReply": {
+        "kind": "new_shot",
+        "conditions": {
+          "film": {
+            "iso": 400,
+            "type": "color_negative"
+          },
+          "light": {
+            "kind": "daylight",
+            "sky": "sun_behind_clouds",
+            "scene": "open",
+            "lowlight": null
+          },
+          "subject": "portrait",
+          "subjectDistanceM": null,
+          "goal": "blur",
+          "lowSun": true,
+          "sunBehindSubject": false,
+          "sunAhead": false,
+          "support": null
+        },
+        "whatIf": null,
+        "question": null,
+        "missing": [],
+        "assumptions": [
+          {
+            "field": "lowSun",
+            "value": true,
+            "why": "said 'winter in Sweden'"
+          }
+        ]
+      },
+      "expectForm": {
+        "lightKind": "daylight",
+        "sky": "sun_behind_clouds",
+        "scene": "open",
+        "subject": "portrait",
+        "goal": "blur",
+        "iso": "400",
+        "filmType": "color_negative",
+        "lowSun": true,
+        "distance": ""
+      },
+      "expectFinal": {
+        "aperture": "4",
+        "shutter": "1/250"
+      },
+      "expectNotSaid": [
+        "distance",
+        "support"
+      ]
+    },
+    {
+      "id": "December in Cuba",
+      "utterance": "December in Cuba, sunny, on the beach",
+      "sampleReply": {
+        "kind": "new_shot",
+        "conditions": {
+          "film": {
+            "iso": null,
+            "type": null
+          },
+          "light": {
+            "kind": "daylight",
+            "sky": "sun",
+            "scene": "snow_sand",
+            "lowlight": null
+          },
+          "subject": null,
+          "subjectDistanceM": null,
+          "goal": null,
+          "lowSun": false,
+          "sunBehindSubject": false,
+          "sunAhead": false,
+          "support": null
+        },
+        "whatIf": null,
+        "question": null,
+        "missing": [
+          "subject"
+        ],
+        "assumptions": []
+      },
+      "expectForm": {
+        "lightKind": "daylight",
+        "sky": "sun",
+        "scene": "snow_sand",
+        "lowSun": false
+      },
+      "expectNotSaid": [
+        "subject",
+        "iso",
+        "goal",
+        "distance",
+        "support"
+      ]
+    },
+    {
+      "id": "tell me a joke",
+      "utterance": "tell me a joke",
+      "sampleReply": {
+        "kind": "out_of_scope",
+        "conditions": null,
+        "whatIf": null,
+        "question": null,
+        "missing": [],
+        "assumptions": []
+      },
+      "expectUnchanged": true,
+      "expectNotice": "out_of_scope"
+    },
+    {
+      "id": "another camera's lens",
+      "utterance": "which lens should I buy for Canon",
+      "sampleReply": {
+        "kind": "out_of_scope",
+        "conditions": null,
+        "whatIf": null,
+        "question": null,
+        "missing": [],
+        "assumptions": []
+      },
+      "expectUnchanged": true,
+      "expectNotice": "out_of_scope"
+    },
+    {
+      "id": "a what-if, not answered yet",
+      "utterance": "what happens if I open the aperture more",
+      "sampleReply": {
+        "kind": "what_if",
+        "conditions": null,
+        "whatIf": {
+          "aperture": null,
+          "shutter": null,
+          "focusM": null,
+          "support": null
+        },
+        "question": "What happens if I open the aperture more?",
+        "missing": [],
+        "assumptions": []
+      },
+      "expectUnchanged": true,
+      "expectNotice": "follow_up"
+    },
+    {
+      "id": "a film named with no speed: the AI must not supply one",
+      "utterance": "sunny park, portrait of my friend, Tri-X",
+      "sampleReply": {
+        "kind": "new_shot",
+        "conditions": {
+          "film": {
+            "iso": null,
+            "type": "bw_negative"
+          },
+          "light": {
+            "kind": "daylight",
+            "sky": "sun",
+            "scene": "open",
+            "lowlight": null
+          },
+          "subject": "portrait",
+          "subjectDistanceM": null,
+          "goal": null,
+          "lowSun": false,
+          "sunBehindSubject": false,
+          "sunAhead": false,
+          "support": null
+        },
+        "whatIf": null,
+        "question": null,
+        "missing": [],
+        "assumptions": [
+          {
+            "field": "film",
+            "value": "bw_negative",
+            "why": "said 'Tri-X'"
+          }
+        ]
+      },
+      "expectForm": {
+        "iso": "400",
+        "filmType": "bw_negative",
+        "subject": "portrait"
+      },
+      "expectNotSaid": [
+        "iso",
+        "goal",
+        "distance",
+        "support"
+      ]
+    },
+    {
+      "id": "by a window is a scene",
+      "utterance": "portrait indoors by a window, ISO 400",
+      "sampleReply": {
+        "kind": "new_shot",
+        "conditions": {
+          "film": {
+            "iso": 400,
+            "type": "color_negative"
+          },
+          "light": {
+            "kind": "daylight",
+            "sky": null,
+            "scene": "indoor_window",
+            "lowlight": null
+          },
+          "subject": "portrait",
+          "subjectDistanceM": null,
+          "goal": null,
+          "lowSun": false,
+          "sunBehindSubject": false,
+          "sunAhead": false,
+          "support": null
+        },
+        "whatIf": null,
+        "question": null,
+        "missing": [],
+        "assumptions": [
+          {
+            "field": "film",
+            "value": "color_negative",
+            "why": "no film type said"
+          }
+        ]
+      },
+      "expectForm": {
+        "lightKind": "daylight",
+        "scene": "indoor_window",
+        "subject": "portrait",
+        "iso": "400"
+      },
+      "expectNotSaid": [
+        "sky",
+        "goal",
+        "distance",
+        "support"
+      ],
+      "expectFinal": {
+        "aperture": "2.8",
+        "shutter": "1/60"
+      }
+    },
+    {
+      "id": "in the apartment, with no other detail",
+      "utterance": "a portrait in the apartment",
+      "sampleReply": {
+        "kind": "new_shot",
+        "conditions": {
+          "film": {
+            "iso": null,
+            "type": null
+          },
+          "light": {
+            "kind": "daylight",
+            "sky": null,
+            "scene": "indoor_room",
+            "lowlight": null
+          },
+          "subject": "portrait",
+          "subjectDistanceM": null,
+          "goal": null,
+          "lowSun": false,
+          "sunBehindSubject": false,
+          "sunAhead": false,
+          "support": null
+        },
+        "whatIf": null,
+        "question": null,
+        "missing": [],
+        "assumptions": [
+          {
+            "field": "light.scene",
+            "value": "indoor_room",
+            "why": "said 'in the apartment', no window or lamps mentioned"
+          }
+        ]
+      },
+      "expectForm": {
+        "lightKind": "daylight",
+        "scene": "indoor_room",
+        "subject": "portrait"
+      },
+      "expectFinal": {
+        "aperture": "2.8",
+        "shutter": "1/60",
+        "support": "hand"
+      },
+      "expectNotSaid": [
+        "sky",
+        "iso",
+        "goal",
+        "distance",
+        "support"
+      ]
+    }
+  ]
+}

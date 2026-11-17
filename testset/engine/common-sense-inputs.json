@@ -1,0 +1,13 @@
+{
+  "source": "Every combination of these values is run against the rules in docs/ENGINE_SPEC.md section 13.3, on every test camera in cameras.json.",
+  "cameras": ["compact", "fast", "half", "slow", "dim", "box"],
+  "iso": [16, 25, 32, 50, 64, 100, 125, 160, 200, 250, 320, 400, 500, 800, 1600, 3200],
+  "skyLightestFirst": ["sun", "sun_haze", "sun_behind_clouds", "overcast", "storm"],
+  "scene": ["snow_sand", "open", "under_trees"],
+  "lowlight": ["sun_low", "sun_just_set", "dusk", "street_night", "home_lamps", "floodlit"],
+  "indoorFollowingDaylight": ["window", "room"],
+  "indoorFixed": ["lamps", "office"],
+  "subject": ["portrait", "two_people", "group", "landscape"],
+  "goal": [null, "blur", "sharp", "moving"],
+  "support": [null, "hand", "braced", "surface"]
+}

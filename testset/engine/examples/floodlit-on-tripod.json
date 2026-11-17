@@ -1,0 +1,20 @@
+{
+  "film": {
+    "iso": 400,
+    "type": "color_negative"
+  },
+  "light": {
+    "kind": "lowlight",
+    "lowlight": "floodlit"
+  },
+  "subject": "landscape",
+  "support": "surface",
+  "camera": {
+    "widestAperture": "2.8",
+    "smallestAperture": "22",
+    "focalLengthMm": 40,
+    "fastestShutter": "1/250",
+    "slowestShutter": "1/15",
+    "hasBulb": true
+  }
+}

@@ -1,0 +1,526 @@
+{
+  "source": "docs/ENGINE_SPEC.md section 13.1. A failing case is fixed in the engine, not by changing a value here.",
+  "defaults": {
+    "film": { "iso": 400, "type": "color_negative" },
+    "support": null
+  },
+  "defaultCamera": "compact",
+  "daylightTable": {
+    "id": "G1",
+    "source": "Kodak's daylight table at ISO 400 (ENGINE_SPEC section 3), one step for each doubling of film speed, rounded to the nearest step. The first step's aperture at 1/250 in sun, on the compact test camera; null where the camera has no matching setting.",
+    "rows": [
+      { "iso": 32, "snow_sand": "5.6", "open": "4", "under_trees": "2.8" },
+      { "iso": 64, "snow_sand": "8", "open": "5.6", "under_trees": "4" },
+      { "iso": 100, "snow_sand": "11", "open": "8", "under_trees": "5.6" },
+      { "iso": 125, "snow_sand": "11", "open": "8", "under_trees": "5.6" },
+      { "iso": 160, "snow_sand": "16", "open": "11", "under_trees": "8" },
+      { "iso": 200, "snow_sand": "16", "open": "11", "under_trees": "8" },
+      { "iso": 250, "snow_sand": "16", "open": "11", "under_trees": "8" },
+      { "iso": 320, "snow_sand": "22", "open": "16", "under_trees": "11" },
+      { "iso": 400, "snow_sand": "22", "open": "16", "under_trees": "11" },
+      { "iso": 500, "snow_sand": "22", "open": "16", "under_trees": "11" },
+      { "iso": 800, "snow_sand": null, "open": "22", "under_trees": "16" }
+    ]
+  },
+  "filmSteps": {
+    "id": "G3",
+    "source": "round(log2(iso / 100)), for daylight, evening, night and indoors alike.",
+    "rows": [
+      [10, -3], [16, -3], [25, -2], [32, -2], [50, -1], [64, -1], [100, 0], [125, 0], [160, 1],
+      [200, 1], [250, 1], [320, 2], [400, 2], [500, 2], [800, 3], [1000, 3], [1600, 4], [3200, 5]
+    ]
+  },
+  "sharpZones": {
+    "id": "G27, G53",
+    "rows": [
+      { "camera": "compact", "aperture": "8", "distanceM": 3, "nearM": 2.08, "farM": 5.4 },
+      { "camera": "compact", "aperture": "2.8", "distanceM": 1.2, "nearM": 1.13, "farM": 1.28 },
+      { "camera": "compact", "aperture": "8", "distanceM": 5, "nearM": 2.87, "farM": 19.53 },
+      { "camera": "compact", "aperture": "4", "distanceM": 1, "nearM": 0.93, "farM": 1.08 },
+      { "camera": "fast", "aperture": "8", "distanceM": 3, "nearM": 2.34, "farM": 4.19 },
+      { "camera": "fast", "aperture": "1.4", "distanceM": 1, "nearM": 0.98, "farM": 1.02 },
+      { "camera": "fast", "aperture": "16", "distanceM": 5, "nearM": 2.56, "farM": 100.81 }
+    ]
+  },
+  "landscapeFocus": {
+    "id": "G32, G54",
+    "rows": [
+      { "camera": "compact", "aperture": "2.8", "focusM": null, "nearM": 18.9 },
+      { "camera": "compact", "aperture": "4", "focusM": null, "nearM": 13.37 },
+      { "camera": "compact", "aperture": "5.6", "focusM": 10, "nearM": 4.86 },
+      { "camera": "compact", "aperture": "8", "focusM": 10, "nearM": 4.01 },
+      { "camera": "compact", "aperture": "11", "focusM": 5, "nearM": 2.44 },
+      { "camera": "compact", "aperture": "16", "focusM": 5, "nearM": 2.01 },
+      { "camera": "compact", "aperture": "22", "focusM": 3, "nearM": 1.33 },
+      { "camera": "fast", "aperture": "8", "focusM": null, "nearM": 10.47 },
+      { "camera": "fast", "aperture": "11", "focusM": 10, "nearM": 4.25 },
+      { "camera": "fast", "aperture": "16", "focusM": 10, "nearM": 3.44 }
+    ]
+  },
+  "usualDistances": {
+    "id": "G57",
+    "source": "ENGINE_SPEC section 7: focal length × framing height ÷ 24 mm, rounded to 0.1 m. The framing heights are estimates.",
+    "rows": [
+      { "focalLengthMm": 28, "portrait": 0.7, "two_people": 1, "group": 2.8 },
+      { "focalLengthMm": 35, "portrait": 0.9, "two_people": 1.2, "group": 3.5 },
+      { "focalLengthMm": 40, "portrait": 1, "two_people": 1.4, "group": 4 },
+      { "focalLengthMm": 50, "portrait": 1.3, "two_people": 1.8, "group": 5 },
+      { "focalLengthMm": 58, "portrait": 1.5, "two_people": 2.1, "group": 5.8 }
+    ]
+  },
+  "cases": [
+    { "id": "G2 ISO 125 counts as 100, the nearest step", "input": { "film": { "iso": 125, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" }, "expect": { "final": { "aperture": "8", "shutter": "1/250" } } },
+    { "id": "G2 ISO 160 counts as 200, the nearest step", "input": { "film": { "iso": 160, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" }, "expect": { "final": { "aperture": "11", "shutter": "1/250" } } },
+
+    { "id": "G4 slide film", "input": { "film": { "iso": 100, "type": "slide" }, "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" }, "expect": { "refused": "unsupported_film" } },
+    { "id": "G4 ISO 10 gets advice", "input": { "film": { "iso": 10, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" }, "expect": { "final": { "aperture": "5.6", "shutter": "1/60" } } },
+
+    { "id": "G5 sun", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" }, "expect": { "firstStep": { "aperture": "16", "shutter": "1/250" } } },
+    { "id": "G5 sun in haze", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "open" }, "subject": "group" }, "expect": { "firstStep": { "aperture": "16", "shutter": "1/125" } } },
+    { "id": "G5 sun behind clouds", "input": { "light": { "kind": "daylight", "sky": "sun_behind_clouds", "scene": "open" }, "subject": "group" }, "expect": { "firstStep": { "aperture": "16", "shutter": "1/60" } } },
+    { "id": "G5 overcast", "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "group" }, "expect": { "firstStep": { "aperture": "16", "shutter": "1/30" } } },
+    { "id": "G5 storm", "input": { "light": { "kind": "daylight", "sky": "storm", "scene": "open" }, "subject": "group" }, "expect": { "firstStep": { "aperture": "16", "shutter": "1/15" } } },
+
+    {
+      "id": "G6",
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "snow_sand" }, "subject": "group" },
+      "expect": { "final": { "aperture": "22", "shutter": "1/250" }, "estimate": false, "noWarnings": ["light_estimate"] }
+    },
+    {
+      "id": "G7",
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "under_trees" }, "subject": "group" },
+      "expect": { "firstStep": { "aperture": "11", "shutter": "1/250" }, "final": { "aperture": "8", "shutter": "1/125" } }
+    },
+    {
+      "id": "G8",
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "portrait", "goal": "sharp", "sunBehindSubject": true },
+      "expect": { "firstStep": { "aperture": "16", "shutter": "1/250" }, "final": { "aperture": "8", "shutter": "1/250" }, "warnings": [{ "code": "flare_risk" }] }
+    },
+    {
+      "id": "G9",
+      "note": "The worked example: the JSON in section 12, exactly",
+      "input": { "light": { "kind": "daylight", "sky": "sun_behind_clouds", "scene": "open" }, "subject": "portrait", "lowSun": true },
+      "expect": {
+        "exact": {
+          "steps": [
+            { "kind": "daylight_value", "aperture": "16", "shutter": "1/60" },
+            { "kind": "low_sun", "stops": 1, "aperture": "11", "shutter": "1/60" },
+            { "kind": "same_light_for_goal", "aperture": "5.6", "shutter": "1/250" },
+            { "kind": "blur_extra", "stops": 1, "aperture": "4", "shutter": "1/250" }
+          ],
+          "final": {
+            "aperture": "4",
+            "shutter": "1/250",
+            "bulbSeconds": null,
+            "support": "hand",
+            "focus": { "meters": 1, "source": "default" },
+            "sharpZone": { "nearM": 0.93, "farM": 1.08 },
+            "shakeRisk": "none"
+          },
+          "estimate": true,
+          "estimates": ["low_sun", "usual_distance"],
+          "warnings": [{ "code": "light_estimate" }, { "code": "focus_critical" }],
+          "facts": [{ "id": "f1", "text": "Kodak's table for this sky and scene: f/16, 1/60", "kb": [] }]
+        }
+      }
+    },
+    {
+      "id": "G10",
+      "input": { "light": { "kind": "daylight", "sky": "storm", "scene": "open" }, "subject": "group", "support": "hand" },
+      "expect": { "firstStep": { "aperture": "16", "shutter": "1/15" }, "final": { "aperture": "8", "shutter": "1/60" }, "estimate": true, "warnings": [{ "code": "light_estimate" }] }
+    },
+    {
+      "id": "G11",
+      "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "group", "support": "hand" },
+      "expect": { "firstStep": { "aperture": "16", "shutter": "1/30" }, "final": { "aperture": "8", "shutter": "1/125" } }
+    },
+    {
+      "id": "G12",
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "portrait" },
+      "expect": {
+        "final": { "aperture": "11", "shutter": "1/250", "sharpZone": { "nearM": 0.83, "farM": 1.26 } },
+        "warnings": [{ "code": "blur_limited" }]
+      }
+    },
+    {
+      "id": "G13",
+      "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "8", "shutter": "1/125", "focus": { "meters": 10, "source": "landscape" }, "sharpZone": { "nearM": 4.01, "farM": null } } }
+    },
+    {
+      "id": "G14",
+      "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "open" }, "subject": "group", "goal": "moving" },
+      "expect": { "final": { "aperture": "11", "shutter": "1/250" } }
+    },
+    {
+      "id": "G15",
+      "input": { "film": { "iso": 800, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "sun", "scene": "snow_sand" }, "subject": "group" },
+      "expect": {
+        "firstStep": { "aperture": null, "shutter": null },
+        "final": { "aperture": "22", "shutter": "1/250" },
+        "warnings": [{ "code": "least_light_limit", "stops": 1 }]
+      }
+    },
+    {
+      "id": "G16",
+      "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "snow_sand" }, "subject": "group", "support": "hand" },
+      "expect": { "final": { "aperture": "8", "shutter": "1/250" }, "estimate": true, "warnings": [{ "code": "light_estimate" }] }
+    },
+    {
+      "id": "G17",
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "under_trees" }, "subject": "group", "lowSun": true },
+      "expect": { "final": { "aperture": "8", "shutter": "1/60" } }
+    },
+    {
+      "id": "G18",
+      "input": { "light": { "kind": "lowlight", "lowlight": "sun_low" }, "subject": "group" },
+      "expect": { "final": { "aperture": "8", "shutter": "1/250", "support": "hand" } }
+    },
+    {
+      "id": "G19",
+      "input": { "light": { "kind": "lowlight", "lowlight": "sun_just_set" }, "subject": "group" },
+      "expect": { "final": { "aperture": "5.6", "shutter": "1/60", "support": "hand" } }
+    },
+    {
+      "id": "G20",
+      "input": { "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group" },
+      "expect": { "final": { "aperture": "2.8", "shutter": "1/60", "support": "hand" } }
+    },
+    {
+      "id": "G21",
+      "input": { "light": { "kind": "lowlight", "lowlight": "home_lamps" }, "subject": "group" },
+      "expect": { "final": { "aperture": "2.8", "shutter": "1/15", "support": "surface" } }
+    },
+    {
+      "id": "G22",
+      "input": { "light": { "kind": "lowlight", "lowlight": "floodlit" }, "subject": "group" },
+      "expect": {
+        "final": { "aperture": "5.6", "shutter": "B", "bulbSeconds": 1, "support": "surface" },
+        "warnings": [{ "code": "b_counted_seconds", "seconds": 1 }]
+      }
+    },
+    {
+      "id": "G23 hand",
+      "input": { "light": { "kind": "lowlight", "lowlight": "dusk" }, "subject": "group", "support": "hand" },
+      "expect": { "final": { "aperture": "2.8", "shutter": "1/60" }, "warnings": [{ "code": "dusk_no_value" }] }
+    },
+    {
+      "id": "G23 braced",
+      "input": { "light": { "kind": "lowlight", "lowlight": "dusk" }, "subject": "group", "support": "braced" },
+      "expect": { "final": { "aperture": "2.8", "shutter": "1/30" }, "warnings": [{ "code": "dusk_no_value" }] }
+    },
+    {
+      "id": "G23 surface",
+      "input": { "light": { "kind": "lowlight", "lowlight": "dusk" }, "subject": "group", "support": "surface" },
+      "expect": { "final": { "aperture": "2.8", "shutter": "1/15" }, "warnings": [{ "code": "dusk_no_value" }] }
+    },
+    {
+      "id": "G24",
+      "input": { "light": { "kind": "lowlight", "lowlight": "home_lamps" }, "subject": "group", "support": "hand" },
+      "expect": {
+        "final": { "aperture": "2.8", "shutter": "1/60" },
+        "warnings": [{ "code": "not_enough_light", "stops": 2, "suggestSupport": "surface" }]
+      }
+    },
+    {
+      "id": "G25 ISO 100",
+      "input": { "film": { "iso": 100, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group" },
+      "expect": { "final": { "aperture": "2.8", "shutter": "1/15", "support": "surface" } }
+    },
+    {
+      "id": "G25 ISO 200",
+      "input": { "film": { "iso": 200, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group" },
+      "expect": { "final": { "aperture": "2.8", "shutter": "1/30", "support": "braced" } }
+    },
+    {
+      "id": "G26",
+      "input": { "film": { "iso": 100, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "floodlit" }, "subject": "group" },
+      "expect": { "final": { "aperture": "2.8", "shutter": "B", "bulbSeconds": 1, "support": "surface" } }
+    },
+
+    { "id": "G29 portrait at 0.7 m", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "portrait", "subjectDistanceM": 0.7 }, "expect": { "final": { "focus": { "meters": 0.7, "source": "given" } }, "warnings": [{ "code": "close_focus" }] } },
+    { "id": "G29 portrait, no distance", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "portrait" }, "expect": { "final": { "focus": { "meters": 1, "source": "default" } }, "noWarnings": ["close_focus"] } },
+    { "id": "G29 other at 1 m", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "other", "subjectDistanceM": 1 }, "expect": { "final": { "focus": { "meters": 1, "source": "given" } }, "noWarnings": ["close_focus"] } },
+
+    {
+      "id": "G30",
+      "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "under_trees" }, "subject": "group" },
+      "expect": { "firstStep": { "aperture": "11", "shutter": "1/125" }, "final": { "aperture": "8", "shutter": "1/125" } }
+    },
+    {
+      "id": "G31",
+      "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "open" }, "subject": "portrait", "goal": "sharp", "sunBehindSubject": true },
+      "expect": { "firstStep": { "aperture": "16", "shutter": "1/125" }, "final": { "aperture": "8", "shutter": "1/250" }, "warnings": [{ "code": "flare_risk" }] }
+    },
+
+    {
+      "id": "G32 f/2.8",
+      "input": { "film": { "iso": 25, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "2.8", "focus": { "meters": null, "source": "landscape" }, "sharpZone": { "nearM": 18.9, "farM": null } } }
+    },
+    {
+      "id": "G32 f/4",
+      "input": { "film": { "iso": 50, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "4", "focus": { "meters": null, "source": "landscape" }, "sharpZone": { "nearM": 13.37, "farM": null } } }
+    },
+    {
+      "id": "G32 f/5.6",
+      "input": { "film": { "iso": 100, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "5.6", "focus": { "meters": 10, "source": "landscape" }, "sharpZone": { "nearM": 4.86, "farM": null } } }
+    },
+    {
+      "id": "G32 f/8",
+      "input": { "film": { "iso": 200, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "8", "focus": { "meters": 10, "source": "landscape" }, "sharpZone": { "nearM": 4.01, "farM": null } } }
+    },
+    {
+      "id": "G32 f/11",
+      "input": { "film": { "iso": 1600, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "11", "focus": { "meters": 5, "source": "landscape" }, "sharpZone": { "nearM": 2.44, "farM": null } } }
+    },
+    {
+      "id": "G32 f/16",
+      "input": { "film": { "iso": 3200, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "16", "focus": { "meters": 5, "source": "landscape" }, "sharpZone": { "nearM": 2.01, "farM": null } } }
+    },
+    {
+      "id": "G32 f/22",
+      "input": { "film": { "iso": 6400, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "22", "focus": { "meters": 3, "source": "landscape" }, "sharpZone": { "nearM": 1.33, "farM": null } } }
+    },
+
+    { "id": "G33 home lamps, people", "input": { "light": { "kind": "lowlight", "lowlight": "home_lamps" }, "subject": "group" }, "expect": { "warnings": [{ "code": "people_not_recommended" }] } },
+    { "id": "G33 floodlit, people", "input": { "light": { "kind": "lowlight", "lowlight": "floodlit" }, "subject": "group" }, "expect": { "warnings": [{ "code": "people_not_recommended" }] } },
+    { "id": "G33 street at 1/30, people", "input": { "film": { "iso": 200, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group" }, "expect": { "warnings": [{ "code": "people_hold_still" }] } },
+    { "id": "G33 home lamps, no people", "input": { "light": { "kind": "lowlight", "lowlight": "home_lamps" }, "subject": "landscape" }, "expect": { "noWarnings": ["people_hold_still", "people_not_recommended"] } },
+
+    {
+      "id": "G34 surface",
+      "note": "A surface always reaches the light by using B",
+      "input": { "light": { "kind": "lowlight", "lowlight": "floodlit" }, "subject": "landscape", "support": "surface" },
+      "expect": {
+        "final": { "aperture": "5.6", "shutter": "B", "bulbSeconds": 1, "support": "surface" },
+        "warnings": [{ "code": "b_counted_seconds", "seconds": 1 }],
+        "noWarnings": ["not_enough_light"]
+      }
+    },
+    {
+      "id": "G34 hand",
+      "input": { "light": { "kind": "lowlight", "lowlight": "floodlit" }, "subject": "landscape", "support": "hand" },
+      "expect": {
+        "final": { "aperture": "2.8", "shutter": "1/60" },
+        "warnings": [{ "code": "not_enough_light", "stops": 4, "suggestSupport": "surface" }]
+      }
+    },
+
+    { "id": "G35 hazy shade", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "under_trees" }, "subject": "group" }, "expect": { "estimate": true, "warnings": [{ "code": "light_estimate" }] } },
+    { "id": "G35 hazy backlight", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "open" }, "subject": "portrait", "goal": "sharp", "sunBehindSubject": true }, "expect": { "estimate": true, "warnings": [{ "code": "light_estimate" }] } },
+    { "id": "G35 hazy, sun behind a distant group: no correction", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "open" }, "subject": "group", "sunBehindSubject": true }, "expect": { "estimate": false, "noWarnings": ["light_estimate"] } },
+    { "id": "G35 sunny shade comes from Kodak, not an estimate", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "under_trees" }, "subject": "group" }, "expect": { "estimate": false, "noWarnings": ["light_estimate"] } },
+
+    { "id": "G36 sun", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "portrait", "goal": "sharp", "sunBehindSubject": true }, "expect": { "warnings": [{ "code": "flare_risk" }] } },
+    { "id": "G36 sun in haze", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "open" }, "subject": "portrait", "goal": "sharp", "sunBehindSubject": true }, "expect": { "warnings": [{ "code": "flare_risk" }] } },
+    { "id": "G36 sun behind clouds", "input": { "light": { "kind": "daylight", "sky": "sun_behind_clouds", "scene": "open" }, "subject": "portrait", "goal": "sharp", "sunBehindSubject": true }, "expect": { "warnings": [{ "code": "flare_risk" }] } },
+    { "id": "G36 overcast", "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "portrait", "goal": "sharp", "sunBehindSubject": true }, "expect": { "noWarnings": ["flare_risk"] } },
+    { "id": "G36 storm", "input": { "light": { "kind": "daylight", "sky": "storm", "scene": "open" }, "subject": "portrait", "goal": "sharp", "sunBehindSubject": true }, "expect": { "noWarnings": ["flare_risk"] } },
+    { "id": "G36 sun low", "input": { "light": { "kind": "lowlight", "lowlight": "sun_low" }, "subject": "group", "sunAhead": true }, "expect": { "warnings": [{ "code": "flare_risk" }] } },
+    { "id": "G36 sun just set", "input": { "light": { "kind": "lowlight", "lowlight": "sun_just_set" }, "subject": "group", "sunAhead": true }, "expect": { "noWarnings": ["flare_risk"] } },
+    { "id": "G36 home lamps", "input": { "light": { "kind": "lowlight", "lowlight": "home_lamps" }, "subject": "group", "sunAhead": true }, "expect": { "noWarnings": ["flare_risk"] } },
+
+    { "id": "G37 street, people", "input": { "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group" }, "expect": { "final": { "shutter": "1/60" }, "warnings": [{ "code": "people_hold_still" }] } },
+    { "id": "G37 street, no people", "input": { "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "landscape" }, "expect": { "noWarnings": ["people_hold_still", "people_not_recommended"] } },
+    { "id": "G37 just after sunset, people", "input": { "light": { "kind": "lowlight", "lowlight": "sun_just_set" }, "subject": "group" }, "expect": { "final": { "shutter": "1/60" }, "noWarnings": ["people_hold_still", "people_not_recommended"] } },
+
+    { "id": "G38 by a window", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "sun" }, "subject": "group" }, "expect": { "estimate": true, "final": { "aperture": "2.8", "shutter": "1/60", "support": "hand" }, "warnings": [{ "code": "light_estimate" }] } },
+    { "id": "G38 away from a window", "input": { "light": { "kind": "indoors", "indoor": "room", "sky": "sun" }, "subject": "group" }, "expect": { "estimate": true, "final": { "aperture": "2.8", "shutter": "1/30", "support": "braced" }, "warnings": [{ "code": "light_estimate" }, { "code": "people_hold_still" }] } },
+    { "id": "G38 with lamps", "input": { "light": { "kind": "indoors", "indoor": "lamps" }, "subject": "group" }, "expect": { "estimate": true, "final": { "aperture": "2.8", "shutter": "1/15", "support": "surface" }, "warnings": [{ "code": "light_estimate" }, { "code": "people_not_recommended" }] } },
+    { "id": "G38 office or shop", "input": { "light": { "kind": "indoors", "indoor": "office" }, "subject": "group" }, "expect": { "estimate": true, "final": { "aperture": "2.8", "shutter": "1/60", "support": "hand" }, "warnings": [{ "code": "light_estimate" }] } },
+
+    { "id": "G39 window, overcast: the same as sun", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "overcast" }, "subject": "group" }, "expect": { "final": { "aperture": "2.8", "shutter": "1/60", "support": "hand" } } },
+    { "id": "G39 window, storm clouds: 1 step", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "storm" }, "subject": "group" }, "expect": { "final": { "aperture": "2.8", "shutter": "1/30", "support": "braced" } } },
+    { "id": "G39 window, low sun: 1 step", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "sun" }, "subject": "group", "lowSun": true }, "expect": { "final": { "aperture": "2.8", "shutter": "1/30", "support": "braced" } } },
+    { "id": "G39 window, storm clouds and low sun: 2 steps", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "storm" }, "subject": "group", "lowSun": true }, "expect": { "final": { "aperture": "2.8", "shutter": "1/15", "support": "surface" } } },
+    { "id": "G39 lamps ignore the sky and low sun", "input": { "light": { "kind": "indoors", "indoor": "lamps", "sky": "storm" }, "subject": "group", "lowSun": true }, "expect": { "final": { "aperture": "2.8", "shutter": "1/15", "support": "surface" } } },
+    { "id": "G39 an office ignores the sky and low sun", "input": { "light": { "kind": "indoors", "indoor": "office", "sky": "storm" }, "subject": "group", "lowSun": true }, "expect": { "final": { "aperture": "2.8", "shutter": "1/60", "support": "hand" } } },
+
+    { "id": "G40 window, ISO 100", "input": { "film": { "iso": 100, "type": "color_negative" }, "light": { "kind": "indoors", "indoor": "window", "sky": "sun" }, "subject": "group" }, "expect": { "final": { "aperture": "2.8", "shutter": "1/15", "support": "surface" } } },
+    { "id": "G40 window, ISO 1600", "input": { "film": { "iso": 1600, "type": "color_negative" }, "light": { "kind": "indoors", "indoor": "window", "sky": "sun" }, "subject": "group" }, "expect": { "final": { "aperture": "5.6", "shutter": "1/60", "support": "hand" } } },
+    { "id": "G40 away from a window, ISO 200", "input": { "film": { "iso": 200, "type": "color_negative" }, "light": { "kind": "indoors", "indoor": "room", "sky": "sun" }, "subject": "group" }, "expect": { "final": { "aperture": "2.8", "shutter": "1/15", "support": "surface" } } },
+
+    { "id": "G41 indoors, no flare warning", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "sun" }, "subject": "group", "sunAhead": true, "sunBehindSubject": true }, "expect": { "noWarnings": ["flare_risk"] } },
+
+    { "id": "G42 portrait by a window", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "sun" }, "subject": "portrait" }, "expect": { "final": { "aperture": "2.8", "shutter": "1/60", "focus": { "meters": 1, "source": "default" }, "sharpZone": { "nearM": 0.95, "farM": 1.05 } }, "warnings": [{ "code": "focus_critical" }], "noWarnings": ["blur_limited"] } },
+
+    {
+      "id": "G43 ISO 1600",
+      "note": "1 step less light than the camera can give",
+      "input": { "film": { "iso": 1600, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" },
+      "expect": { "final": { "aperture": "22", "shutter": "1/250" }, "warnings": [{ "code": "least_light_limit", "stops": 1 }] }
+    },
+    {
+      "id": "G43 ISO 3200",
+      "input": { "film": { "iso": 3200, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" },
+      "expect": { "final": { "aperture": "22", "shutter": "1/250" }, "warnings": [{ "code": "least_light_limit", "stops": 2 }] }
+    },
+
+    {
+      "id": "G44",
+      "camera": "fast",
+      "input": { "film": { "iso": 800, "type": "color_negative" }, "light": { "kind": "daylight", "sky": "sun", "scene": "snow_sand" }, "subject": "group" },
+      "expect": { "final": { "aperture": "16", "shutter": "1/1000" }, "noWarnings": ["least_light_limit"] }
+    },
+    {
+      "id": "G45",
+      "camera": "fast",
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "portrait" },
+      "expect": { "final": { "aperture": "5.6", "shutter": "1/1000", "focus": { "meters": 1.3, "source": "default" } }, "noWarnings": ["blur_limited"] }
+    },
+    {
+      "id": "G46",
+      "camera": "fast",
+      "input": { "light": { "kind": "lowlight", "lowlight": "floodlit" }, "subject": "group", "support": "surface" },
+      "expect": {
+        "final": { "aperture": "5.6", "shutter": "1", "bulbSeconds": null, "support": "surface" },
+        "warnings": [{ "code": "people_not_recommended" }],
+        "noWarnings": ["b_counted_seconds"]
+      }
+    },
+    {
+      "id": "G47",
+      "camera": "fast",
+      "input": { "film": { "iso": 100, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group", "support": "hand" },
+      "expect": { "final": { "aperture": "1.4", "shutter": "1/60" }, "warnings": [{ "code": "people_hold_still" }], "noWarnings": ["not_enough_light"] }
+    },
+    {
+      "id": "G48",
+      "camera": "half",
+      "input": { "film": { "iso": 100, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group", "support": "hand" },
+      "expect": { "final": { "aperture": "1.8", "shutter": "1/60" }, "warnings": [{ "code": "not_enough_light", "stops": 1, "suggestSupport": "braced" }] }
+    },
+    {
+      "id": "G49",
+      "camera": "half",
+      "input": { "film": { "iso": 25, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "floodlit" }, "subject": "group", "support": "surface" },
+      "expect": { "final": { "aperture": "1.8", "shutter": "1" }, "warnings": [{ "code": "not_enough_light", "stops": 1 }] }
+    },
+    {
+      "id": "G50 hand",
+      "camera": "slow",
+      "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "sun" }, "subject": "group", "support": "hand" },
+      "expect": { "final": { "aperture": "3.5", "shutter": "1/60" }, "warnings": [{ "code": "not_enough_light", "stops": 1, "suggestSupport": "braced" }] }
+    },
+    {
+      "id": "G50 surface",
+      "camera": "slow",
+      "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "sun" }, "subject": "group", "support": "surface" },
+      "expect": { "final": { "aperture": "3.5", "shutter": "1/30", "support": "surface" }, "noWarnings": ["not_enough_light"] }
+    },
+    {
+      "id": "G51",
+      "camera": "slow",
+      "input": { "light": { "kind": "lowlight", "lowlight": "home_lamps" }, "subject": "group", "support": "surface" },
+      "expect": { "final": { "aperture": "11", "shutter": "B", "bulbSeconds": 1 }, "warnings": [{ "code": "b_counted_seconds", "seconds": 1 }] }
+    },
+    {
+      "id": "G52 hand",
+      "camera": "slow",
+      "input": { "light": { "kind": "lowlight", "lowlight": "dusk" }, "subject": "group", "support": "hand" },
+      "expect": { "final": { "aperture": "3.5", "shutter": "1/60" }, "warnings": [{ "code": "dusk_no_value" }] }
+    },
+    {
+      "id": "G52 surface",
+      "camera": "slow",
+      "input": { "light": { "kind": "lowlight", "lowlight": "dusk" }, "subject": "group", "support": "surface" },
+      "expect": { "final": { "aperture": "3.5", "shutter": "1/30" }, "warnings": [{ "code": "dusk_no_value" }] }
+    },
+    {
+      "id": "G55 24 mm",
+      "cameraChanges": { "focalLengthMm": 24 },
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" },
+      "expect": { "refused": "unsupported_lens" }
+    },
+    {
+      "id": "G55 85 mm",
+      "cameraChanges": { "focalLengthMm": 85 },
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" },
+      "expect": { "refused": "unsupported_lens" }
+    },
+    {
+      "id": "G56",
+      "camera": "fast",
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" },
+      "whatIf": { "aperture": "32" },
+      "expect": { "refused": "not_on_camera" }
+    },
+
+    { "id": "G58 portrait with a 28 mm lens", "cameraChanges": { "focalLengthMm": 28 }, "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "portrait" }, "expect": { "final": { "focus": { "meters": 0.7, "source": "default" } }, "warnings": [{ "code": "close_focus" }] } },
+    { "id": "G58 two people with a 35 mm lens", "cameraChanges": { "focalLengthMm": 35 }, "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "two_people" }, "expect": { "final": { "focus": { "meters": 1.2, "source": "default" } }, "noWarnings": ["close_focus"] } },
+
+    { "id": "G59 storm clouds", "input": { "light": { "kind": "daylight", "sky": "storm", "scene": "open" }, "subject": "group" }, "expect": { "estimate": true, "warnings": [{ "code": "light_estimate" }] } },
+    { "id": "G59 snow or sand in hazy sun", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "snow_sand" }, "subject": "group" }, "expect": { "estimate": true, "warnings": [{ "code": "light_estimate" }] } },
+    { "id": "G59 snow or sand under overcast", "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "snow_sand" }, "subject": "group" }, "expect": { "estimate": true, "warnings": [{ "code": "light_estimate" }] } },
+    { "id": "G59 under trees, sun behind clouds", "input": { "light": { "kind": "daylight", "sky": "sun_behind_clouds", "scene": "under_trees" }, "subject": "group" }, "expect": { "estimate": true, "warnings": [{ "code": "light_estimate" }] } },
+    { "id": "G59 under trees, overcast", "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "under_trees" }, "subject": "group" }, "expect": { "estimate": true, "warnings": [{ "code": "light_estimate" }] } },
+    { "id": "G59 open, sun", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "group" }, "expect": { "estimate": false, "noWarnings": ["light_estimate"] } },
+    { "id": "G59 open, sun in haze", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "open" }, "subject": "group" }, "expect": { "estimate": false, "noWarnings": ["light_estimate"] } },
+    { "id": "G59 open, sun behind clouds", "input": { "light": { "kind": "daylight", "sky": "sun_behind_clouds", "scene": "open" }, "subject": "group" }, "expect": { "estimate": false, "noWarnings": ["light_estimate"] } },
+    { "id": "G59 open, overcast", "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "group" }, "expect": { "estimate": false, "noWarnings": ["light_estimate"] } },
+
+    { "id": "G60 ISO 160 at night counts as 200", "input": { "film": { "iso": 160, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group" }, "expect": { "final": { "aperture": "2.8", "shutter": "1/30", "support": "braced" } } },
+    { "id": "G60 ISO 320 at night counts as 400", "input": { "film": { "iso": 320, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group" }, "expect": { "final": { "aperture": "2.8", "shutter": "1/60", "support": "hand" } } },
+    {
+      "id": "G61",
+      "note": "An f/1.7 lens gets the same light as f/1.8 (G48), named as marked on the lens.",
+      "camera": "half",
+      "cameraChanges": { "widestAperture": "1.7" },
+      "input": { "film": { "iso": 100, "type": "color_negative" }, "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group", "support": "hand" },
+      "expect": { "final": { "aperture": "1.7", "shutter": "1/60" }, "warnings": [{ "code": "not_enough_light", "stops": 1, "suggestSupport": "braced" }] }
+    },
+    {
+      "id": "G62",
+      "note": "An f/4.5 lens counts as f/5.6. Fully open for a blurred background, it is named f/4.5.",
+      "camera": "dim",
+      "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "portrait" },
+      "expect": { "final": { "aperture": "4.5", "shutter": "1/250" } }
+    },
+    {
+      "id": "G63",
+      "note": "An f/5.6 lens, fully open for a blurred background.",
+      "cameraChanges": { "widestAperture": "5.6" },
+      "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "portrait" },
+      "expect": { "final": { "aperture": "5.6", "shutter": "1/250" } }
+    },
+    {
+      "id": "G64",
+      "note": "f/11 and 1/125 are the least light this camera gives: 2 steps too much in full sun.",
+      "camera": "box",
+      "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "landscape" },
+      "expect": { "final": { "aperture": "11", "shutter": "1/125" }, "warnings": [{ "code": "least_light_limit", "stops": 2 }] }
+    },
+    {
+      "id": "G65",
+      "note": "1/125 is the fastest shutter, so a blurred background opens the lens there.",
+      "camera": "box",
+      "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "portrait" },
+      "expect": { "final": { "aperture": "5.6", "shutter": "1/125" } }
+    },
+    {
+      "id": "G66",
+      "note": "Braced allows 1/30, but this dial stops at 1/60. With no B, no support reaches the light.",
+      "camera": "box",
+      "input": { "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "group", "support": "braced" },
+      "expect": { "final": { "aperture": "5.6", "shutter": "1/60" }, "warnings": [{ "code": "not_enough_light", "stops": 2 }] }
+    },
+    { "id": "G67 nothing estimated", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "landscape" }, "expect": { "estimates": [], "estimate": false } },
+    { "id": "G67 low sun and the usual distance", "input": { "light": { "kind": "daylight", "sky": "sun_behind_clouds", "scene": "open" }, "subject": "portrait", "lowSun": true }, "expect": { "estimates": ["low_sun", "usual_distance"], "estimate": true } },
+    { "id": "G68 snow or sand in hazy sun, sun behind, low sun", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "snow_sand" }, "subject": "portrait", "sunBehindSubject": true, "lowSun": true }, "expect": { "estimates": ["snow_sand_not_sun", "hazy_backlight", "low_sun", "usual_distance"], "estimate": true } },
+    { "id": "G68 storm clouds over trees", "input": { "light": { "kind": "daylight", "sky": "storm", "scene": "under_trees" }, "subject": "group" }, "expect": { "estimates": ["storm", "usual_distance"], "estimate": true } },
+    { "id": "G68 storm clouds over snow", "input": { "light": { "kind": "daylight", "sky": "storm", "scene": "snow_sand" }, "subject": "group" }, "expect": { "estimates": ["storm", "usual_distance"], "estimate": true } },
+    { "id": "G69 under trees in hazy sun, at 2 m", "input": { "light": { "kind": "daylight", "sky": "sun_haze", "scene": "under_trees" }, "subject": "portrait", "subjectDistanceM": 2 }, "expect": { "estimates": ["shade_not_sun"], "estimate": true } },
+    { "id": "G69 under trees in sun", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "under_trees" }, "subject": "group" }, "expect": { "estimates": ["usual_distance"], "estimate": false } },
+    { "id": "G70 by a window, storm outside, low sun, at 2 m", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "storm" }, "subject": "other", "subjectDistanceM": 2, "lowSun": true }, "expect": { "estimates": ["indoor", "storm_outside", "low_sun"], "estimate": true } },
+    { "id": "G70 lamps ignore low sun", "input": { "light": { "kind": "indoors", "indoor": "lamps" }, "subject": "group", "lowSun": true }, "expect": { "estimates": ["indoor", "usual_distance"], "estimate": true } },
+    { "id": "G70 street at night", "input": { "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "landscape" }, "expect": { "estimates": ["evening"], "estimate": true } },
+    { "id": "G70 dusk", "input": { "light": { "kind": "lowlight", "lowlight": "dusk" }, "subject": "portrait" }, "expect": { "estimates": ["dusk", "usual_distance"], "estimate": true } }
+  ]
+}

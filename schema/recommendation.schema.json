@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "recommendation.schema.json",
+  "title": "Recommendation",
+  "description": "What the engine returns. See docs/ENGINE_SPEC.md section 12. Null means infinity for focus and far limit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["steps", "final", "estimate", "estimates", "warnings", "facts"],
+  "definitions": {
+    "aperture": { "enum": ["1.4", "1.7", "1.8", "2", "2.8", "3.5", "4", "4.5", "5.6", "8", "11", "16", "22", "32"] },
+    "shutter": {
+      "enum": ["B", "1", "1/2", "1/4", "1/8", "1/15", "1/30", "1/60", "1/125", "1/250", "1/500", "1/1000", "1/2000"]
+    },
+    "support": { "enum": ["hand", "braced", "surface"] }
+  },
+  "properties": {
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "aperture", "shutter"],
+        "properties": {
+          "kind": {
+            "enum": [
+              "daylight_value",
+              "published_value",
+              "indoor_estimate",
+              "dark_sky",
+              "dusk_no_value",
+              "shade",
+              "backlight",
+              "low_sun",
+              "same_light_for_goal",
+              "same_light_for_support",
+              "blur_extra",
+              "least_light_limit",
+              "not_enough_light"
+            ]
+          },
+          "stops": { "type": "integer", "minimum": 1 },
+          "aperture": { "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/aperture" }] },
+          "shutter": { "oneOf": [{ "type": "null" }, { "$ref": "#/definitions/shutter" }] },
+          "bulbSeconds": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "final": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aperture",
+        "shutter",
+        "bulbSeconds",
+        "support",
+        "focus",
+        "sharpZone",
+        "shakeRisk"
+      ],
+      "properties": {
+        "aperture": { "$ref": "#/definitions/aperture" },
+        "shutter": { "$ref": "#/definitions/shutter" },
+        "bulbSeconds": { "type": ["integer", "null"], "minimum": 1 },
+        "support": { "$ref": "#/definitions/support" },
+        "focus": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["meters", "source"],
+          "properties": {
+            "meters": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+            "source": { "enum": ["default", "given", "landscape"] }
+          }
+        },
+        "sharpZone": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["nearM", "farM"],
+          "properties": {
+            "nearM": { "type": "number", "exclusiveMinimum": 0 },
+            "farM": { "type": ["number", "null"], "exclusiveMinimum": 0 }
+          }
+        },
+        "shakeRisk": { "enum": ["none", "low", "medium", "high", "very_high"] }
+      }
+    },
+    "estimate": { "type": "boolean" },
+    "estimates": {
+      "description": "Why the result is an estimate, in order: the light, the corrections, the focus. See docs/ENGINE_SPEC.md section 12a.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "storm",
+          "snow_sand_not_sun",
+          "shade_not_sun",
+          "indoor",
+          "evening",
+          "dusk",
+          "hazy_backlight",
+          "storm_outside",
+          "low_sun",
+          "usual_distance"
+        ]
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code"],
+        "properties": {
+          "code": {
+            "enum": [
+              "least_light_limit",
+              "not_enough_light",
+              "dusk_no_value",
+              "light_estimate",
+              "flare_risk",
+              "blur_limited",
+              "motion_blur_risk",
+              "focus_critical",
+              "close_focus",
+              "people_hold_still",
+              "people_not_recommended",
+              "b_counted_seconds",
+              "long_exposure"
+            ]
+          },
+          "stops": { "type": "integer", "minimum": 1 },
+          "suggestSupport": { "$ref": "#/definitions/support" },
+          "seconds": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text", "kb"],
+        "properties": {
+          "id": { "type": "string" },
+          "text": { "type": "string" },
+          "kb": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

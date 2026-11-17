@@ -1,0 +1,20 @@
+{
+  "film": {
+    "iso": 100,
+    "type": "color_negative"
+  },
+  "light": {
+    "kind": "lowlight",
+    "lowlight": "street_night"
+  },
+  "subject": "group",
+  "support": "hand",
+  "camera": {
+    "widestAperture": "1.4",
+    "smallestAperture": "22",
+    "focalLengthMm": 50,
+    "fastestShutter": "1/1000",
+    "slowestShutter": "1",
+    "hasBulb": true
+  }
+}
