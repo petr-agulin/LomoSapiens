@@ -6,6 +6,8 @@ LomoSapiens is a free web app for your phone. It tells you what to set on a manu
 
 It's made for beginners who shoot film without a light meter, and who otherwise find out weeks later, at the lab, that half the roll came out too dark or blurred.
 
+**Try it: [lomosapiens.pages.dev](https://lomosapiens.pages.dev).** Open it on your phone and add it to your home screen. On a computer it opens in a phone-sized frame.
+
 <table>
   <tr>
     <td align="center"><img src="docs/screenshots/1-home-light.png" width="250" alt="Home in the light theme, with the last recorded frame"><br>Home · Light</td>

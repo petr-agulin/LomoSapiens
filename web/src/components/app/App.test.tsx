@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import App from "../../App";
+import css from "../../index.css?raw";
 import { isTestPage, showsTestPage } from "../../lib/route.ts";
 import { addCamera, EMPTY_STATE, finishRoll, loadRoll, setHold } from "../../lib/store.ts";
 import { Home } from "./Home.tsx";
@@ -16,6 +17,15 @@ const readable = (html: string) =>
     .replace(/\s+/g, " ");
 
 const noop = () => undefined;
+
+const inOrderText = (text: string, parts: string[]) => {
+  let position = 0;
+  for (const part of parts) {
+    const found = text.indexOf(part, position);
+    expect(found, `"${part}" should come next`).toBeGreaterThanOrEqual(0);
+    position = found + part.length;
+  }
+};
 
 describe("the address", () => {
   it("opens the real app everywhere but /test", () => {
@@ -39,6 +49,34 @@ describe("the address", () => {
     expect(text).toContain("LomoSapiens");
     expect(text).not.toContain("Describe the shot");
     expect(text).not.toContain("Time of day");
+  });
+});
+
+describe("on a computer: the phone frame", () => {
+  const page = renderToStaticMarkup(<App path="/" address="lomosapiens.pages.dev" />);
+
+  it("puts the app in a frame, with the note beside it, after the app", () => {
+    expect(page).toContain('<div class="device-stage"><div class="device">');
+    inOrderText(readable(page), [
+      "LomoSapiens",
+      "Made for your phone",
+      "Open lomosapiens.pages.dev on your phone and add it to your home screen. It works offline too.",
+      "Here you can try it as it looks there.",
+    ]);
+  });
+
+  it("names the address the page was opened at", () => {
+    expect(readable(renderToStaticMarkup(<App path="/" address="localhost:5173" />))).toContain("Open localhost:5173 on your phone");
+  });
+
+  it("shows the frame only on a computer with room for it, and the app takes the frame's size, never the window's", () => {
+    const query = /@media \(min-width: 1000px\) and \(min-height: 640px\) and \(hover: hover\) and \(pointer: fine\) \{([\s\S]*?)\n\}/.exec(css);
+    expect(query, "the frame's media query").not.toBeNull();
+    expect(query![1]).toMatch(/\.device \{[^}]*transform: translateZ\(0\)/);
+    expect(query![1]).toMatch(/\.device-hint \{[^}]*display: flex/);
+    // Everywhere else the note is hidden, and the app is the screen's size.
+    expect(css).toMatch(/\.device-hint \{\s*display: none;\s*\}/);
+    expect(css).toMatch(/--app-h: 100dvh;\s*--app-w: min\(100vw, 480px\);/);
   });
 });
 
@@ -80,7 +118,8 @@ describe("Home on first launch", () => {
   });
 
   it("names no camera model", () => {
-    expect(text.replace(/LomoSapiens/g, "")).not.toMatch(/LOMO|135M|Nikkormat|Zenit/i);
+    // The app's own name, in its address too, is not a camera.
+    expect(text.replace(/lomosapiens/gi, "")).not.toMatch(/LOMO|135M|Nikkormat|Zenit/i);
   });
 });
 

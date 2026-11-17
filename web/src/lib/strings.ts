@@ -151,6 +151,12 @@ export const strings = {
     /** Home's subtitle. */
     tagline: "Set your manual film camera for the best shot",
     heroAlt: "An ape, an early human and a person with a camera, walking in a line",
+    /** On a computer, beside the phone frame: the app is made for the phone, and where to open it there. */
+    device: {
+      title: "Made for your phone",
+      line: (address: string) => `Open ${address} on your phone and add it to your home screen. It works offline too.`,
+      here: "Here you can try it as it looks there.",
+    },
     menu: "Menu",
     back: "Back",
     /** The name an unnamed camera gets: the first, then "Camera 2", "Camera 3". */

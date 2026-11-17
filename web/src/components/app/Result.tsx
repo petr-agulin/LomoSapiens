@@ -30,8 +30,8 @@ const text = strings.app.result;
  * The big numbers: as large as two columns of the film strip allow on this screen, 40 to 80 px.
  * A four-digit shutter speed stops at 58 px.
  */
-const BIG = "clamp(40px, calc((min(100vw, 480px) - 144px) / 3.42), 80px)";
-const BIG_FOUR = "clamp(40px, calc((min(100vw, 480px) - 144px) / 4.56), 58px)";
+const BIG = "clamp(40px, calc((var(--app-w) - 144px) / 3.42), 80px)";
+const BIG_FOUR = "clamp(40px, calc((var(--app-w) - 144px) / 4.56), 58px)";
 const bigNumber = "font-display font-semibold leading-[0.92] tracking-[-0.045em] whitespace-nowrap";
 const smallPart = "text-[26px] font-medium opacity-60 whitespace-nowrap";
 

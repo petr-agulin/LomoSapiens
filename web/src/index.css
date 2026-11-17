@@ -269,3 +269,50 @@ body {
   line-height: 1.4;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* The app's own height and width: the screen's on a phone. Screens, sheets and the result's big numbers size
+   themselves from these, never from the window, so on a computer they fit the phone frame below. */
+:root {
+  --app-h: 100dvh;
+  --app-w: min(100vw, 480px);
+}
+
+/* On a computer, the app sits in a phone-shaped frame, with a note beside it that it is made for the phone.
+   Only with a mouse and room for the frame: phones and tablets never see it. The frame's transform makes it the
+   box that the app's fixed parts (sheets, the menu, the paper layer) fill, instead of the window. */
+.device-hint {
+  display: none;
+}
+@media (min-width: 1000px) and (min-height: 640px) and (hover: hover) and (pointer: fine) {
+  :root {
+    --app-h: min(844px, calc(100dvh - 56px));
+    --app-w: 412px;
+  }
+  .device-stage {
+    display: flex;
+    min-height: 100dvh;
+    align-items: center;
+    justify-content: center;
+    gap: 72px;
+    background: color-mix(in srgb, var(--bg), var(--ink) 7%);
+  }
+  .device {
+    flex: none;
+    width: var(--app-w);
+    height: var(--app-h);
+    overflow: hidden;
+    border-radius: 46px;
+    background: var(--bg);
+    transform: translateZ(0);
+    box-shadow:
+      0 0 0 11px #18181a,
+      0 0 0 12px color-mix(in srgb, var(--ink) 30%, transparent),
+      0 40px 90px rgb(0 0 0 / 0.25);
+  }
+  .device-hint {
+    display: flex;
+    max-width: 280px;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

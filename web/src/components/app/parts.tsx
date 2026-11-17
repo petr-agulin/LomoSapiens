@@ -241,11 +241,11 @@ export function HelpSheet({ icon, title, text, doneLabel, closeLabel, onClose }:
 
 /**
  * A whole screen: the top row, the content that scrolls, and one main action in thumb reach.
- * On a laptop the screen stays phone-width, centred.
+ * It is as tall as the app (--app-h in index.css): the phone's screen, or on a computer the phone frame.
  */
 export function Screen({ top, children, action }: { top: ReactNode; children: ReactNode; action?: ReactNode }) {
   return (
-    <div className="mx-auto flex h-dvh max-w-[480px] flex-col bg-bg text-ink">
+    <div className="mx-auto flex h-[var(--app-h)] max-w-[480px] flex-col bg-bg text-ink">
       <div className="flex items-center gap-2 px-4 pt-4 pb-1.5">{top}</div>
       {/* Nothing in the column shrinks: when it is taller than the screen, it scrolls instead. */}
       <main className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-4 [scrollbar-width:none] [&>*]:shrink-0">{children}</main>
@@ -315,7 +315,7 @@ export function Sheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby="sheet-title"
-        className="relative flex max-h-[88dvh] flex-col gap-3 overflow-y-auto rounded-t-[var(--sheet-radius)] bg-card px-3 pt-2.5 pb-4 shadow-[var(--sheet-shadow)]"
+        className="relative flex max-h-[calc(var(--app-h)*0.88)] flex-col gap-3 overflow-y-auto rounded-t-[var(--sheet-radius)] bg-card px-3 pt-2.5 pb-4 shadow-[var(--sheet-shadow)]"
       >
         <div {...grab} className="-mx-3 -mt-2.5 flex touch-none flex-col gap-3 px-3 pt-2.5">
           <SheetHandle />
