@@ -8,6 +8,8 @@ It's made for beginners who shoot film without a light meter, and who otherwise 
 
 **Try it: [lomosapiens.pages.dev](https://lomosapiens.pages.dev).** Open it on your phone and add it to your home screen. On a computer it opens in a phone-sized frame.
 
+<p align="center"><img src="docs/screenshots/demo.svg" width="384" alt="LomoSapiens on a phone: switching from dark to the Archive paper look in Settings, analysing a snowy landscape in low sun with its wide sharp zone, recording it as frame 10 of a colour roll, marking an earlier frame Too light after developing, with a note, and opening the Theory article on the sharp zone"></p>
+
 <table>
   <tr>
     <td align="center"><img src="docs/screenshots/1-home-light.png" width="250" alt="Home in the light theme, with the last recorded frame"><br>Home · Light</td>
