@@ -1,13 +1,14 @@
 // Rolls: every roll, in the cameras and finished; a roll's own page; and
 // Roll details, where a roll is corrected, finished or deleted. Its frames join the roll's page in step 4.
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { isDay, today } from "../../lib/dates.ts";
 import { cameraRollLine, dayText, rangeText, recordedText, rollTitle } from "../../lib/rollText.ts";
 import { draftRoll, filmLine, type SetupDraft } from "../../lib/setup.ts";
 import { findRoll, finishedRolls, framesOn, recordedCount, rollsInCameras, type AppState, type Roll, type SavedCamera } from "../../lib/store.ts";
 import { strings } from "../../lib/strings.ts";
-import { FrameRow } from "./Frames.tsx";
+import { FrameRow, frameRowId } from "./Frames.tsx";
 import { CARD_ICON, Icon, PathIcon } from "./icons.tsx";
+import { useReturnedFrom } from "./navigation.ts";
 import { AddCard, ConfirmSheet, Crumb, MainButton, OptionRow, Screen, ScreenTitle, SectionLabel, Sheet, Unbroken } from "./parts.tsx";
 import { ColourDot, FilmStep } from "./Setup.tsx";
 
@@ -134,6 +135,27 @@ export function RollsHome({
   );
 }
 
+/** The room kept between a frame's row brought into view and the edge of the screen. */
+const ROW_MARGIN = 12;
+
+/**
+ * Back from a frame: the screen opens scrolled where it was left. If the frames' own buttons went on to a
+ * frame whose row is out of sight, as when marking a developed roll, that row is scrolled just into view.
+ * A row partly in sight, such as one tapped at the screen's edge, leaves the list exactly where it was.
+ */
+function useFrameInView(frameId: string | null) {
+  // After the screen's own scroll is put back: a parent's layout effect runs after its children's.
+  useLayoutEffect(() => {
+    const row = frameId && document.getElementById(frameRowId(frameId));
+    const column = row && row.closest("main");
+    if (!row || !column) return;
+    const shown = column.getBoundingClientRect();
+    const place = row.getBoundingClientRect();
+    if (place.bottom <= shown.top) column.scrollTop -= shown.top + ROW_MARGIN - place.top;
+    else if (place.top >= shown.bottom) column.scrollTop += place.bottom - (shown.bottom - ROW_MARGIN);
+  }, [frameId]);
+}
+
 /** One roll's page: where it is or was, how many frames are recorded, its details, then its frames. */
 export function RollPage({
   state,
@@ -153,6 +175,8 @@ export function RollPage({
   /** Adding a frame not recorded on the result: only on a roll in a camera. */
   onAddFrame: () => void;
 }) {
+  const from = useReturnedFrom();
+  useFrameInView(from?.name === "frame" ? from.id : null);
   const found = findRoll(state, rollId);
   if (!found) return null;
   const { roll, cameraName, finishedOn } = found;

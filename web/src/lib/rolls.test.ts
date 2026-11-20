@@ -331,6 +331,18 @@ describe("changing a frame", () => {
     expect(after.frames[0].developedNote).toBe("Light leak");
   });
 
+  it("puts each label that says 'a bit' before its stronger one, and the new kinds of fault before Other", () => {
+    const after = editFrame(shot, "f1", { labels: ["other", "artefacts", "too_light", "bit_light", "sun_flare", "bit_out_of_focus", "offset_frame", "double_exposure", "bit_dark"] });
+    expect(after.frames[0].labels).toEqual(["bit_dark", "bit_light", "too_light", "bit_out_of_focus", "sun_flare", "double_exposure", "offset_frame", "artefacts", "other"]);
+  });
+
+  it("keeps a note after developing of several lines and up to 1000 characters, cutting what is longer", () => {
+    const lines = "Washed out.\nNext time one step less light.";
+    expect(editFrame(shot, "f1", { developedNote: `${lines}\n` }).frames[0].developedNote).toBe(lines);
+    expect(editFrame(shot, "f1", { developedNote: "a".repeat(1000) }).frames[0].developedNote).toHaveLength(1000);
+    expect(editFrame(shot, "f1", { developedNote: "a".repeat(1200) }).frames[0].developedNote).toHaveLength(1000);
+  });
+
   it("makes the roll as long as a number changed past its end, never shorter", () => {
     expect(rollOf(editFrame(shot, "f1", { number: 40 }), mine)?.frames).toBe(40);
     expect(rollOf(editFrame(editFrame(shot, "f1", { number: 40 }), "f1", { number: 3 }), mine)?.frames).toBe(40);

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { adviceAsSet, differenceText, differsFromAdvice, lightDifference, settingsText } from "../../lib/record.ts";
 import { momentText, rollTitle } from "../../lib/rollText.ts";
 import { filmLine } from "../../lib/setup.ts";
-import { LABELS, findRoll, framesOn, type AppState, type Frame, type FrameLabel, type ShotAnswers } from "../../lib/store.ts";
+import { LABELS, MAX_DEVELOPED_NOTE, findRoll, framesOn, type AppState, type Frame, type FrameLabel, type ShotAnswers } from "../../lib/store.ts";
 import { strings } from "../../lib/strings.ts";
 import { CARD_ICON, Icon, PathIcon } from "./icons.tsx";
 import { SettingsStrip } from "./LastShot.tsx";
@@ -25,11 +25,17 @@ function sceneWords(answers: ShotAnswers) {
   return [tags[0].label, ...(subject ? [subject.label] : [])].join(" · ");
 }
 
-/** One frame in a roll's list: its number, what was set, the advice when anything differs, and the note. */
+/** A frame's row in its roll's list, by its id: the list brings it into view on returning from the frame. */
+export const frameRowId = (frameId: string) => `frame-row-${frameId}`;
+
+/**
+ * One frame in a roll's list: its number, what was set, the advice when anything differs, the note, and the
+ * labels after developing with their note, cut to the rest of the labels' line, or a line of its own.
+ */
 export function FrameRow({ frame, onOpen }: { frame: Frame; onOpen: () => void }) {
   const differs = differsFromAdvice(frame.set, frame.advice);
   return (
-    <button type="button" onClick={onOpen} className="flex min-h-[66px] w-full cursor-pointer items-center gap-3 border-t border-line py-2 text-left first:border-t-0">
+    <button type="button" id={frameRowId(frame.id)} onClick={onOpen} className="flex min-h-[66px] w-full cursor-pointer items-center gap-3 border-t border-line py-2 text-left first:border-t-0">
       <span className="grid h-9 min-w-9 flex-none place-items-center rounded-[10px] bg-hero px-1.5 font-display text-[17px] font-semibold text-hero-ink">
         <span className="sr-only">{text.title(frame.number)}</span>
         <span aria-hidden="true">{frame.number}</span>
@@ -49,13 +55,15 @@ export function FrameRow({ frame, onOpen }: { frame: Frame; onOpen: () => void }
           {differs ? text.advised(settingsText(adviceAsSet(frame.advice))) : sceneWords(frame.answers)}
         </span>
         {frame.note && <span className="truncate text-[13px] leading-[1.35] text-muted">{frame.note}</span>}
-        {frame.labels.length > 0 && (
-          <span className="flex flex-wrap gap-1 pt-1">
+        {(frame.labels.length > 0 || frame.developedNote) && (
+          <span className="flex flex-wrap items-center gap-1 pt-1">
             {frame.labels.map((label) => (
               <span key={label} className="rounded-full bg-chip px-2 py-px text-xs font-medium text-ink">
                 {developedText.labels[label]}
               </span>
             ))}
+            {/* At least 6rem of the labels' last line, or a whole line under them; its lines join into one. */}
+            {frame.developedNote && <span className="min-w-24 flex-1 truncate text-[13px] leading-[1.35] text-muted">{frame.developedNote}</span>}
           </span>
         )}
       </span>
@@ -73,7 +81,11 @@ function ActionRow({ icon, title, onClick, opensSheet }: { icon: string; title: 
   );
 }
 
-/** After developing: the six labels, any number at once, and a note. They save as they change. */
+/**
+ * After developing: the labels, any number at once, and a note of a few lines. They save as they change.
+ * The labels are small tags, as in "Your shot", to keep the card short; each one also answers a tap in
+ * the gap around it, so no tap between them is lost.
+ */
 function AfterDeveloping({
   frame,
   onLabels,
@@ -100,7 +112,7 @@ function AfterDeveloping({
               type="button"
               aria-pressed={on}
               onClick={() => toggle(label)}
-              className={`min-h-11 cursor-pointer rounded-full px-4 text-[15px] font-medium ${on ? "bg-hero text-hero-ink" : "bg-chip text-ink"}`}
+              className={`relative inline-flex h-7 cursor-pointer items-center rounded-full px-3 text-sm font-medium whitespace-nowrap before:absolute before:-inset-1 before:content-[''] ${on ? "bg-hero text-hero-ink" : "bg-chip text-ink"}`}
             >
               {developedText.labels[label]}
             </button>
@@ -110,17 +122,18 @@ function AfterDeveloping({
       <label htmlFor="developed-note" className="pt-1.5 text-[13px] text-muted">
         {developedText.note}
       </label>
-      <input
+      {/* Four lines to start with, growing with what is typed. */}
+      <textarea
         id="developed-note"
-        type="text"
-        maxLength={200}
+        rows={4}
+        maxLength={MAX_DEVELOPED_NOTE}
         value={note}
         placeholder={developedText.notePlaceholder}
         onChange={(event) => {
           setNote(event.target.value);
           onNote(event.target.value);
         }}
-        className="min-h-12 w-full rounded-xl border border-line bg-chip px-3 text-base text-ink"
+        className="min-h-[115px] w-full resize-none rounded-xl border border-line bg-chip px-3 py-2.5 text-base leading-[1.45] text-ink [field-sizing:content]"
       />
     </section>
   );

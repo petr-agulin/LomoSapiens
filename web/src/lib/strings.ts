@@ -628,10 +628,18 @@ export const strings = {
       title: "Mark after developing",
       labels: {
         good: "Good",
+        bit_dark: "A bit dark",
         too_dark: "Too dark",
+        bit_light: "A bit light",
         too_light: "Too light",
+        bit_out_of_focus: "A bit out of focus",
         out_of_focus: "Out of focus",
         movement: "Blurred by movement",
+        /** A bright patch or streak where the sun shone into the lens. */
+        sun_flare: "Sun flare",
+        double_exposure: "Double exposure",
+        offset_frame: "Offset frame",
+        artefacts: "Weird artefacts",
         other: "Other",
       },
       note: "Developing note",

@@ -102,8 +102,22 @@ export interface LastShot {
   result: ShotSummary;
 }
 
-/** The labels after developing, in the order the app shows them. */
-export const LABELS = ["good", "too_dark", "too_light", "out_of_focus", "movement", "other"] as const;
+/** The labels after developing, in the order the app shows them: each "a bit" one before its stronger one. */
+export const LABELS = [
+  "good",
+  "bit_dark",
+  "too_dark",
+  "bit_light",
+  "too_light",
+  "bit_out_of_focus",
+  "out_of_focus",
+  "movement",
+  "sun_flare",
+  "double_exposure",
+  "offset_frame",
+  "artefacts",
+  "other",
+] as const;
 export type FrameLabel = (typeof LABELS)[number];
 
 /** What the user set on the camera for a frame. B keeps its seconds; a focus of null is ∞. */
@@ -157,6 +171,8 @@ const MAX_NUMBER = 99;
 const DEFAULT_FRAMES = 36;
 const MAX_NAME = 40;
 const MAX_NOTE = 200;
+/** The note after developing has room for a few sentences: what went wrong and what to try next time. */
+export const MAX_DEVELOPED_NOTE = 1000;
 
 // ---------------------------------------------------------------- reading
 
@@ -414,7 +430,7 @@ export function editFrame(
     note: change.note === undefined ? frame.note : fit(change.note, MAX_NOTE),
     photo: change.photo === undefined ? frame.photo : change.photo,
     labels: change.labels === undefined ? frame.labels : LABELS.filter((label) => change.labels?.includes(label)),
-    developedNote: change.developedNote === undefined ? frame.developedNote : fit(change.developedNote, MAX_NOTE),
+    developedNote: change.developedNote === undefined ? frame.developedNote : fit(change.developedNote, MAX_DEVELOPED_NOTE),
   };
   if (!isFrame(next)) return state;
   return longEnoughFor({ ...state, frames: state.frames.map((saved) => (saved.id === frameId ? next : saved)) }, next.rollId, next.number);
@@ -601,7 +617,7 @@ function isFrame(value: unknown): value is Frame {
     (value.photo === null || typeof value.photo === "string") &&
     Array.isArray(value.labels) &&
     value.labels.every((label) => oneOf(LABELS, label)) &&
-    isText(value.developedNote, MAX_NOTE)
+    isText(value.developedNote, MAX_DEVELOPED_NOTE)
   );
 }
 

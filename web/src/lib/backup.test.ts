@@ -25,7 +25,7 @@ state = addCamera(state, { name: "Spare", answers: compact, film: null }, "2026-
 state = recordFrame(state, frame("r1", 1, "p-0011223344556677"), "2026-11-02T10:00").state;
 state = loadRoll(state, "c1", { iso: 100, type: "bw_negative", frames: 24 }, "2026-11-05");
 state = recordFrame(state, frame("r2", 1), "2026-11-06T09:30").state;
-state = editFrame(state, "f1", { labels: ["good"], developedNote: "Sharp" });
+state = editFrame(state, "f1", { labels: ["good", "bit_dark", "double_exposure"], developedNote: `Sharp.\n${"A long note on two lines. ".repeat(30)}` });
 state = setLastShot(setHold(state, "braced"), { answers, result: advice });
 const photos = { "p-0011223344556677": "data:image/jpeg;base64,/9j/4AAQ" };
 

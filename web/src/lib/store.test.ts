@@ -193,7 +193,8 @@ describe("saving between visits", () => {
     const shot = { set: { aperture: "4", shutter: "B", bulbSeconds: 2, focusM: null }, advice: lastShot.result, answers: lastShot.answers, hold: "surface", photo: "p1" } as const;
     state = recordFrame(state, { rollId: "r1", number: 1, note: "Anna", ...shot }, "2026-11-14T15:42").state;
     state = loadRoll(state, "c1", { iso: 100, type: "bw_negative", frames: 24, name: "Box" }, DAY);
-    state = editFrame(state, "f1", { labels: ["good", "too_light"], developedNote: "Fine" });
+    state = editFrame(state, "f1", { labels: ["good", "bit_light", "sun_flare"], developedNote: `Fine.\n${"Long note. ".repeat(80)}` });
+    expect(state.frames[0].developedNote.length).toBeGreaterThan(800);
     saveState(store, state);
     expect(Object.keys(store.data)).toEqual([STORE_KEY]);
     expect(savedVersion(store)).toBe(2);
