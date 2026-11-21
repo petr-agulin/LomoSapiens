@@ -95,7 +95,7 @@ describe("step 1: what's the light?", () => {
       "Snow and sand make the light brighter, trees and shade make it darker.",
       "Snow or sand", "Snowy fields, ski slopes, beaches, dunes",
       "Open terrain", "Streets, squares, parks, fields, gardens",
-      "Under trees", "Forest, shade, building's shadow, porch",
+      "Under trees or in the shade", "Forest, building's shadow, porch, pram hood",
       "Torn between two? Pick the darker one.",
     ]);
     expect(where).toContain('aria-label="Back to the sky: Sun"');

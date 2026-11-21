@@ -24,23 +24,38 @@ const UP_TO_500: Camera = { ...LENS_40, fastestShutter: "1/500", slowestShutter:
 
 const day = (sky: Extract<Light, { kind: "daylight" }>["sky"], scene: Extract<Light, { kind: "daylight" }>["scene"] = "open"): Light => ({ kind: "daylight", sky, scene });
 
-function ask(light: Light, { iso = 400, subject = "landscape" as Subject, goal = undefined as Goal | undefined, support = "hand" as Support, camera = LENS_40 } = {}) {
-  const conditions: Conditions = { film: { iso, type: "color_negative" }, light, subject, goal, support, camera };
+function ask(light: Light, { iso = 400, subject = "landscape" as Subject, goal = undefined as Goal | undefined, support = "hand" as Support, camera = LENS_40, sunBehindSubject = false } = {}) {
+  const conditions: Conditions = { film: { iso, type: "color_negative" }, light, subject, goal, support, camera, sunBehindSubject };
   const result = recommend(conditions);
   if (isRefusal(result)) throw new Error(result.refused);
   return { conditions, result: result as Recommendation };
 }
 
 /** The light for the sky and scene, with its corrections, in steps: the aperture's index plus the shutter's. */
-function lightValue(light: Light, iso: number) {
-  const { result } = ask(light, { iso, support: "surface" });
+function lightValue(light: Light, iso: number, { subject = "landscape" as Subject, sunBehindSubject = false } = {}) {
+  const { result } = ask(light, { iso, subject, sunBehindSubject, support: "surface" });
   const forLight = result.steps.filter((step) => ["daylight_value", "shade", "backlight", "low_sun"].includes(step.kind));
   const last = forLight[forLight.length - 1];
   return APERTURE_INDEX[last.aperture!] + SHUTTER_INDEX[last.shutter as TimedShutter];
 }
 
 /** That light as the pair at a given shutter: "f/16 at 1/250". */
-const lightAt = (light: Light, iso: number, shutter: TimedShutter = "1/250") => `f/${wholeStepAperture(lightValue(light, iso) - SHUTTER_INDEX[shutter])} at ${shutter}`;
+const lightAt = (light: Light, iso: number, shutter: TimedShutter = "1/250", who: Parameters<typeof lightValue>[2] = {}) =>
+  `f/${wholeStepAperture(lightValue(light, iso, who) - SHUTTER_INDEX[shutter])} at ${shutter}`;
+
+/** A face, lit from the front or with the sun behind it. */
+const face = (sunBehindSubject: boolean) => ({ subject: "portrait" as Subject, sunBehindSubject });
+
+/** The lights in which a portrait with the sun behind it gets the flare warning, by their names on the light step. */
+function flareLights() {
+  const named: [Light, string][] = [
+    [day("sun"), "Sun"], [day("sun_haze"), "sun in haze"], [day("sun_behind_clouds"), "sun behind clouds"], [day("overcast"), "overcast"], [day("storm"), "storm clouds"],
+    ...(["sun_low", "sun_just_set", "dusk", "street_night", "home_lamps", "floodlit"] as const).map((lowlight): [Light, string] => [{ kind: "lowlight", lowlight }, lowlight === "sun_low" ? "sun on the horizon" : lowlight]),
+    ...(["window", "room", "lamps", "office"] as const).map((indoor): [Light, string] => [{ kind: "indoors", indoor }, indoor]),
+  ];
+  const warned = named.filter(([light]) => ask(light, face(true)).result.warnings.some((warning) => warning.code === "flare_risk"));
+  return warned.map(([, name]) => name).join(", ");
+}
 
 /** A shutter speed by its step index, past the engine's dial too: 1/4000 and 1/8000 above it, whole seconds below 1 s. */
 const speedAt = (index: number) => (index < 0 ? `${2 ** -index} s` : (shutterAt(index) ?? { 12: "1/4000", 13: "1/8000" }[index] ?? "?"));
@@ -129,12 +144,17 @@ const PRACTICE: Record<string, () => string> = {
   "sunny-16|Sun, ISO 400, Kodak's table": () => lightAt(day("sun"), 400, "1/500"),
   "sunny-16|Sun, ISO 400, the app": () => lightAt(day("sun"), 400),
   "sunny-16|Overcast, ISO 400, the app": () => lightAt(day("overcast"), 400),
-  "sunny-16|Under trees in sun, ISO 400, the app": () => lightAt(day("sun", "under_trees"), 400),
+  "sunny-16|In the shade in sun, ISO 400, the app": () => lightAt(day("sun", "under_trees"), 400),
   "sunny-16|Snow or sand in sun, ISO 400, the app": () => lightAt(day("sun", "snow_sand"), 400),
   "same-light|Sun behind clouds, ISO 400, up to 1/500, moving subject": () =>
     finalPair(ask(day("sun_behind_clouds"), { subject: "group", goal: "moving", camera: UP_TO_500 })),
   "same-light|The same, blurred background": () => finalPair(ask(day("sun_behind_clouds"), { subject: "portrait", goal: "blur", camera: UP_TO_500 })),
   "same-light|The same, everything sharp": () => finalPair(ask(day("sun_behind_clouds"), { subject: "group", goal: "sharp", camera: UP_TO_500 })),
+  "flare|Face in sun, ISO 400, sun behind you": () => lightAt(day("sun"), 400, "1/250", face(false)),
+  "flare|The same, sun behind them": () => lightAt(day("sun"), 400, "1/250", face(true)),
+  // Kodak's own pair for a backlit close-up subject in bright sun at ISO 400 is at 1/500 (E-7023).
+  "flare|Kodak's table, backlit face, ISO 400": () => lightAt(day("sun"), 400, "1/500", face(true)),
+  "flare|The flare warning, with the sun behind them": flareLights,
   // Exposure triangle, Depth of field and Movement.
   "triangle|Sun behind clouds, ISO 400": () => lightAt(day("sun_behind_clouds"), 400),
   "triangle|The same, one step wider": () => lightAt(day("sun_behind_clouds"), 400, "1/500"),
@@ -203,7 +223,7 @@ const text = (parts: { text: string }[]) => parts.map((part) => part.text).join(
 // ------------------------------------------------------------ the tests
 
 describe("the theory articles", () => {
-  it("are the nine articles of the design, then Lenses, Exposure triangle, Depth of field and Movement", () => {
+  it("are the nine articles of the design, then Lenses, Exposure triangle, Depth of field, Movement and Into the light", () => {
     expect(ARTICLES.map((article) => `${article.topic}: ${article.title}`)).toEqual([
       "The basics: A step of light",
       "The basics: Aperture",
@@ -211,6 +231,7 @@ describe("the theory articles", () => {
       "The basics: Film speed",
       "Reading the light: Sunny 16",
       "Reading the light: Same light, different settings",
+      "Reading the light: Into the light",
       "Exposure triangle: The exposure triangle",
       "Exposure triangle: Creatively correct exposure",
       "Exposure triangle: Film grain",
@@ -259,10 +280,15 @@ describe("the theory articles", () => {
 
   it("cite only the agreed kinds of source: Wikipedia, Kodak's data sheet, plain maths, or the app's own rules", () => {
     // What no Wikipedia page holds, for that article only: checking a used lens, two buying guides;
-    // the name "exposure triangle", a camera dealer's guide.
+    // the name "exposure triangle", a camera dealer's guide; the cost of much extra light, and flare from a bright
+    // sky in the shade, Kodak's own 1997 data sheet, no longer on Kodak's site, in the copy kept by the University
+    // of Zurich's film colour archive.
+    const kodakE182 = "https://filmcolors.org/wp-content/uploads/2025/12/KODAK-Pro-Films_E-182.pdf";
     const guides: Record<string, string[]> = {
       "buying-lens": ["https://www.japancamerahunter.com/2014/03/classic-lens-buyers-guide/", "https://phillipreeve.net/blog/?p=805"],
       triangle: ["https://www.mpb.com/en-us/blog/article/12745/"],
+      "sunny-16": [kodakE182],
+      flare: [kodakE182],
     };
     for (const article of ARTICLES) {
       for (const source of article.sources) {
@@ -286,6 +312,8 @@ describe("the theory articles", () => {
     expect(all("creative-exposure")).toContain("These are the app's own rules.");
     expect(all("nd-filter")).toContain("This is the app's own advice.");
     expect(all("movement")).toContain("This is the app's own advice.");
+    expect(all("flare")).toContain("the hand is the app's own advice");
+    expect(all("flare")).toContain("These are the app's own rules.");
   });
 
   it("call the sharp zone by its usual name too, depth of field", () => {
@@ -399,8 +427,8 @@ describe("the numbers in the articles are the app's own", () => {
 
 describe("searching the articles", () => {
   it("keeps every article while nothing is typed", () => {
-    expect(findArticles("")).toHaveLength(20);
-    expect(findArticles("   ")).toHaveLength(20);
+    expect(findArticles("")).toHaveLength(21);
+    expect(findArticles("   ")).toHaveLength(21);
   });
 
   it("matches the title or the teaser, ignoring case, with every word typed", () => {
@@ -419,6 +447,8 @@ describe("searching the articles", () => {
     expect(findArticles("grain").map((article) => article.id)).toEqual(["grain"]);
     expect(findArticles("water").map((article) => article.id)).toEqual(["movement"]);
     expect(findArticles("filter").map((article) => article.id)).toEqual(["nd-filter"]);
+    expect(findArticles("flare").map((article) => article.id)).toEqual(["flare"]);
+    expect(findArticles("haze").map((article) => article.id)).toEqual(["flare"]);
   });
 });
 

@@ -102,7 +102,7 @@ describe("the page", () => {
 
   it("names each sky with Kodak's description, and has one scene for snow or sand", () => {
     for (const name of ["Sun - ", "Sun in haze - ", "Sun behind clouds - ", "Overcast - ", "Storm clouds - "]) expect(text).toContain(name);
-    for (const name of ["Snow or sand - ", "Open terrain - ", "Under trees - "]) expect(text).toContain(name);
+    for (const name of ["Snow or sand - ", "Open terrain - ", "Under trees or in the shade - "]) expect(text).toContain(name);
     expect(text).not.toContain("Beach - ");
   });
 
@@ -297,7 +297,7 @@ describe("the Scene options", () => {
   it.each([
     "Snow or sand - Snowy fields, ski slopes, beaches, dunes",
     "Open terrain - Streets, squares, parks, fields, gardens",
-    "Under trees - Forest, shade, building's shadow, porch",
+    "Under trees or in the shade - Forest, building's shadow, porch, pram hood",
     "Indoors by a window - Apartment, cafe, next to the glass",
     "Indoors away from a window - Apartment, middle of a room",
     "Indoors with lamps - No daylight, lamps only",

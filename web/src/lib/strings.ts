@@ -374,7 +374,7 @@ export const strings = {
       place: {
         snow_sand: { label: "Snow or sand", sub: "Snowy fields, ski slopes, beaches, dunes" },
         open: { label: "Open terrain", sub: "Streets, squares, parks, fields, gardens" },
-        under_trees: { label: "Under trees", sub: "Forest, shade, building's shadow, porch" },
+        under_trees: { label: "Under trees or in the shade", sub: "Forest, building's shadow, porch, pram hood" },
       },
       backToSky: (sky: string) => `Back to the sky: ${sky}`,
       torn: "Torn between two? Pick the darker one.",
@@ -940,7 +940,7 @@ export const testPageStrings = {
     scene: {
       snow_sand: "Snow or sand",
       open: "Open terrain",
-      under_trees: "Under trees",
+      under_trees: "Under trees or in the shade",
       indoor_window: "Indoors by a window",
       indoor_room: "Indoors away from a window",
       indoor_lamps: "Indoors with lamps",
@@ -949,7 +949,7 @@ export const testPageStrings = {
     scenePlaces: {
       snow_sand: "Snowy fields, ski slopes, beaches, dunes",
       open: "Streets, squares, parks, fields, gardens",
-      under_trees: "Forest, shade, building's shadow, porch",
+      under_trees: "Forest, building's shadow, porch, pram hood",
       indoor_window: "Apartment, cafe, next to the glass",
       indoor_room: "Apartment, middle of a room",
       indoor_lamps: "No daylight, lamps only",

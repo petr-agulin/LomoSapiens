@@ -18,7 +18,7 @@ It's made for beginners who shoot film without a light meter, and who otherwise 
   </tr>
   <tr>
     <td align="center"><img src="docs/screenshots/4-light.png" width="250" alt="Picking the sky: sun, haze, clouds, overcast or storm"><br>The light</td>
-    <td align="center"><img src="docs/screenshots/5-place.png" width="250" alt="Picking where you are: snow or sand, open terrain, or under trees"><br>Where you are</td>
+    <td align="center"><img src="docs/screenshots/5-place.png" width="250" alt="Picking where you are: snow or sand, open terrain, or under trees or in the shade"><br>Where you are</td>
     <td align="center"><img src="docs/screenshots/6-result.png" width="250" alt="The result: aperture, shutter speed, focus distance and sharp zone"><br>The result</td>
   </tr>
   <tr>
@@ -42,9 +42,9 @@ It's made for beginners who shoot film without a light meter, and who otherwise 
 - **Your cameras.** Add as many as you have, each described once by its limits: its widest and smallest aperture, its lens's focal length, its fastest and slowest shutter speeds, and whether it has B. "Not sure" picks a value almost every camera has. There is no list of camera models, and the advice never asks for a setting your camera doesn't have. One camera is in use for new shots, and a camera can be added before it has film.
 - **Rolls.** Load a roll into a camera with its film speed, colour or black and white, its length (24, 36 or any other) and, if you like, a name. Finish it when it's done: finished rolls stay, with their frames. Home shows the last frame you recorded.
 - **Recording a frame.** "Record this shot" on the result keeps the frame number, the settings you actually used beside the advice, a note and a photo of the scene. A frame you forgot to record can be added later from the roll's page.
-- **Marking after developing.** Good, Too dark, Too light, Out of focus, Blurred by movement or Other, any of them at once, and a note.
+- **Marking after developing.** Good, a bit or too dark, a bit or too light, a bit or quite out of focus, blurred by movement, sun flare, double exposure, an offset frame, weird artefacts or other, any of them at once, and a note of several lines, shown in the roll's list.
 - **How you hold the camera.** By hand, braced, or on a surface, set once in Settings. It decides the slowest shutter speed the advice will use, down to the camera's slowest, and B for long exposures, on a surface.
-- **Theory.** Short articles behind the numbers: steps of light, the exposure triangle, depth of field, movement, lenses and more, each with its sources.
+- **Theory.** Short articles behind the numbers: steps of light, the exposure triangle, depth of field, movement, flare, lenses and more, each with its sources.
 - **Backup.** Everything, photos included, saved to one file that you keep where you like, and restored from it on this phone or another.
 - **Three looks:** light, dark, or Archive paper; or as the phone is set.
 - **Offline.** It's a web app: it opens in the browser, can be added to the home screen, and works without a connection once it has loaded.

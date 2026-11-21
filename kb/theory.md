@@ -139,9 +139,11 @@ The app starts from Kodak's daylight table for its ISO 400 colour film instead, 
 
 Why one step more? Negative film copes with too much light far better than with too little. Kodak's sheet for its ISO 200 colour film gives it room for two steps too little light and three steps too much. So with negative film, colour or black and white, the extra step is the safe side, and the app keeps to the film maker's own numbers. Slide film forgives far less, and the app doesn't offer it.
 
+Room for too much light isn't a reason to give it, though. Kodak's sheet for its professional films warns that a lot of extra light lowers the contrast in the bright parts of the picture, so they look flatter, and makes the negatives harder for the lab to print well. If unsure, one step more is plenty; adding several steps "to be safe" costs quality.
+
 Kodak's table is for average subjects lit from the front, from 2 hours after sunrise to 2 hours before sunset. When the sun is lower, or all day far north in winter, turn on Low sun: the app adds one step. That step is the app's own estimate.
 
-Snow or sand, and shade under trees, come from Kodak's table too: that is the "Where are you?" question. Kodak gives heavy overcast and open shade the same light, so the app gives both f/5.6 at 1/250 at ISO 400.
+Snow or sand, and shade, under trees or anywhere else, come from Kodak's table too: that is the "Where are you?" question. Kodak's open shade is a subject shaded from the sun but lit by a large area of sky, such as a person in a building's shadow on a sunny day. Kodak gives heavy overcast and open shade the same light, so the app gives both f/5.6 at 1/250 at ISO 400.
 
 ### In practice {#sunny-16-in-practice}
 
@@ -151,13 +153,14 @@ Snow or sand, and shade under trees, come from Kodak's table too: that is the "W
 | Sun, ISO 400, Kodak's table | f/11 at 1/500 |
 | Sun, ISO 400, the app | f/16 at 1/250 |
 | Overcast, ISO 400, the app | f/5.6 at 1/250 |
-| Under trees in sun, ISO 400, the app | f/5.6 at 1/250 |
+| In the shade in sun, ISO 400, the app | f/5.6 at 1/250 |
 | Snow or sand in sun, ISO 400, the app | f/22 at 1/250 |
 
 Sources:
 - [Wikipedia, "Sunny 16 rule"](https://en.wikipedia.org/wiki/Sunny_16_rule): the rule, and its apertures for snow and sand, slight overcast, overcast, heavy overcast, and open shade or sunset.
 - [Kodak, Ultra Max 400 data sheet, E-7023](https://kodakprofessional.com/sites/default/files/wysiwyg/pro/resources/E7023_max_400.pdf): the daylight table the app follows, f/11 at 1/500 in bright sun at ISO 400, its hours, and heavy overcast and open shade on one row.
 - [Kodak, Gold 200 data sheet, E-7022](https://kodakprofessional.com/sites/default/files/wysiwyg/pro/resources/E7022%20Gold%20tech%20sheet.pdf): "wide exposure latitude, from two stops underexposure to three stops overexposure"; its own daylight table is one step more than the rule too.
+- [Kodak, Pro Films data sheet, E-182, 1997](https://filmcolors.org/wp-content/uploads/2025/12/KODAK-Pro-Films_E-182.pdf): "Excessive overexposure will reduce highlight contrast and increase printing times"; open shade as subjects "shaded from the sun but lighted by a large area of clear sky".
 - [Wikipedia, "Exposure latitude"](https://en.wikipedia.org/wiki/Exposure_latitude): reversal (slide) film has very little latitude, colour negative film considerably more.
 - The app's own estimates: storm clouds, and the extra step for low sun <!-- docs/ENGINE_SPEC.md, sections 3 and 4 -->.
 
@@ -189,6 +192,38 @@ Sources:
 - [Wikipedia, "F-number"](https://en.wikipedia.org/wiki/F-number): the light through the lens depends on the opening's area, and each stop halves it.
 - Plain maths: the light is proportional to the time divided by the square of the f-number.
 - The app's own rules: the pair for each goal, and the extra step for a blurred background <!-- docs/ENGINE_SPEC.md, section 6 -->.
+
+## Into the light {#flare}
+
+Topic: Reading the light
+Teaser: Flare, haze, and a face with the sun behind it
+Picture: [Sun in view|Flare|turn a little] [Sun just out|Haze|shade the lens] [Bright sky|Smoky|darks, in shade]
+Caption: Where the bright light is, and what it does to the picture. The sun needn't be in the picture to spoil it.
+Read next: sunny-16, shallow-deep
+
+Flare is light scattered inside the lens. Aimed towards the sun, a lens can show a row of bright rings or circles across the picture, or a haze that washes it out, with less contrast and duller colours.
+
+The sun doesn't have to be in the picture. Shining on the lens from just outside it, the sun shows as a haze. Shade the lens: a lens hood does it, or your hand held between the sun and the lens, just outside the picture; the hand is the app's own advice. A hood can't shade a sun that is in the picture, so turn a little instead: the flare fades as the lens points away from the sun.
+
+In the shade, out of the sun, a bright sky in the picture or just beside it can cause slight flare too. Kodak's sheet for its professional films says it shows as smoky dark tones, and that more light helps against it, though the same sheet warns against a lot more. The app doesn't add any for it: keep the bright sky out of the picture where you can, with a darker background such as a hedge or a wall.
+
+With the sun behind the person, the face you photograph is turned away from it, lit only by the sky. Kodak's table gives a close subject lit from behind, such as a face, two steps more light than one lit from the front: f/5.6 instead of f/11, in bright sun at ISO 400 and 1/500. The app adds those two steps when you turn on Sun behind the person, for a portrait or two people, and the result warns of flare. In hazy sun the app adds one step, and with the sun behind clouds none, as there are no shadows; under an even grey sky it doesn't ask where the sun is. These are the app's own rules.
+
+### In practice {#flare-in-practice}
+
+| What | Value |
+|---|---|
+| Face in sun, ISO 400, sun behind you | f/16 at 1/250 |
+| The same, sun behind them | f/8 at 1/250 |
+| Kodak's table, backlit face, ISO 400 | f/5.6 at 1/500 |
+| The flare warning, with the sun behind them | Sun, sun in haze, sun behind clouds, sun on the horizon |
+
+Sources:
+- [Wikipedia, "Lens flare"](https://en.wikipedia.org/wiki/Lens_flare): light scattered in the lens, most often when it is aimed towards the sun; starbursts, rings or circles in a row across the picture; a haze that washes it out, lowering contrast and colour, when a bright light shines on the lens from outside the picture; avoided by shading the lens with a hood, and fading as the camera points away from the light.
+- [Wikipedia, "Lens hood"](https://en.wikipedia.org/wiki/Lens_hood): a hood blocks the sun to prevent flare, and is made not to block the lens's view.
+- [Kodak, Ultra Max 400 data sheet, E-7023](https://kodakprofessional.com/sites/default/files/wysiwyg/pro/resources/E7023_max_400.pdf): "Use f/5.6 for backlit close-up subjects", against f/11 at 1/500 in bright sun.
+- [Kodak, Pro Films data sheet, E-182, 1997](https://filmcolors.org/wp-content/uploads/2025/12/KODAK-Pro-Films_E-182.pdf): in open shade, a bright sky in or just outside the scene can cause slight lens flare, seen as "smoky" black tones in prints, and more exposure usually overcomes it.
+- The app's own rules and advice: shading the lens with your hand, one step for the sun behind the person in hazy sun and none behind clouds, and when the result warns of flare <!-- docs/ENGINE_SPEC.md, sections 4 and 10 -->.
 
 ## The exposure triangle {#triangle}
 
