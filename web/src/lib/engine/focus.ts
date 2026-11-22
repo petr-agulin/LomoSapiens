@@ -28,8 +28,11 @@ export const CLOSE_FOCUS_M = 1;
 const ROUND_DISTANCES_M = [1, 1.5, 2, 3, 5, 10];
 /** The height a 35 mm frame takes in, in mm. */
 const FRAME_HEIGHT_MM = 24;
-/** ESTIMATES: the height each subject's framing covers, in mm. Head and shoulders, two people, people standing. */
-const FRAMING_HEIGHT_MM = { portrait: 600, two_people: 850, group: 2400 };
+/**
+ * ESTIMATES: the height each subject's framing covers, in mm. Head and shoulders; people waist up; people standing;
+ * something small in the picture with a lot around it.
+ */
+const FRAMING_HEIGHT_MM = { portrait: 600, two_people: 850, group: 2400, far: 4800 };
 type UsualSubject = keyof typeof FRAMING_HEIGHT_MM;
 
 const round2 = (value: number) => Math.round(value * 100) / 100;

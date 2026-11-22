@@ -49,7 +49,8 @@ export function buildWarnings(context: WarningContext): Warning[] {
   const { camera, conditions, aperture, shutter, bulbSeconds, focusM } = context;
   const { light, subject, sunAhead, sunBehindSubject } = conditions;
   const goal = effectiveGoal(conditions);
-  const people = subject === "portrait" || subject === "two_people" || subject === "group";
+  // Every choice that may hold people, near or further off; not a landscape, or a distance typed for anything else.
+  const people = subject === "portrait" || subject === "two_people" || subject === "group" || subject === "far";
   const daylight = light.kind === "daylight";
   const streetNight = light.kind === "lowlight" && light.lowlight === "street_night";
   const s = shutter === "B" ? null : SHUTTER_INDEX[shutter];

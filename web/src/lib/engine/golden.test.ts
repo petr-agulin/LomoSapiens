@@ -86,7 +86,7 @@ describe("golden tests from ENGINE_SPEC section 13.1", () => {
   });
 
   describe(`${golden.usualDistances.id}: usual distances from the lens`, () => {
-    const subjects = ["portrait", "two_people", "group"] as const;
+    const subjects = ["portrait", "two_people", "group", "far"] as const;
     for (const row of golden.usualDistances.rows) {
       for (const subject of subjects) {
         it(`${row.focalLengthMm} mm, ${subject}: ${row[subject]} m`, () => {

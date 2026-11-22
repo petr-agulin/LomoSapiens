@@ -154,7 +154,7 @@ describe("the page", () => {
 
   it("says the distance is needed for the subject Other, and optional for the rest", () => {
     expect(text).toContain(
-      'Needed when Subject is "Other". For Portrait, Two people, Group or Landscape, it\'s optional and replaces the usual focus distance.',
+      'Needed when Subject is "Other". For Portrait, Subject close by, Subject a few steps away, Something further off or Landscape, it\'s optional and replaces the usual focus distance.',
     );
     expect(text).not.toContain("Needed for Other.");
   });
@@ -326,10 +326,11 @@ describe("the Subject options", () => {
   const text = readable(renderToStaticMarkup(<TestPage />));
 
   it.each([
-    "Portrait - One person, head and shoulders - About 1 m",
-    "Two people - Head and shoulders - About 1.4 m",
-    "Group - Three or more, standing - About 4 m",
-    "Landscape - Views, distant buildings - Focus keeps ∞ sharp",
+    "Portrait - A person with head and shoulders, or a tight shot of any object - About 1 m",
+    "Subject close by - People waist up, a dog, a vase of flowers - About 1.4 m",
+    "Subject a few steps away - A person head to toe, a group, a whole car, a street door - About 4 m",
+    "Something further off - Small in the picture with a lot around it - About 8 m",
+    "Landscape - Scenery, distant view - Focus keeps ∞ sharp",
     "Other - Anything else - Enter the distance below",
   ])("shows %s with a 40 mm lens", (option) => {
     expect(text).toContain(option);
@@ -339,9 +340,10 @@ describe("the Subject options", () => {
     const fifty = readable(
       renderToStaticMarkup(<TestPage initialForm={{ ...DEFAULT_FORM, camera: { ...STARTING_CAMERA, focalLengthMm: "50" } }} />),
     );
-    expect(fifty).toContain("Portrait - One person, head and shoulders - About 1.3 m");
-    expect(fifty).toContain("Two people - Head and shoulders - About 1.8 m");
-    expect(fifty).toContain("Group - Three or more, standing - About 5 m");
+    expect(fifty).toContain("Portrait - A person with head and shoulders, or a tight shot of any object - About 1.3 m");
+    expect(fifty).toContain("Subject close by - People waist up, a dog, a vase of flowers - About 1.8 m");
+    expect(fifty).toContain("Subject a few steps away - A person head to toe, a group, a whole car, a street door - About 5 m");
+    expect(fifty).toContain("Something further off - Small in the picture with a lot around it - About 10 m");
   });
 });
 
@@ -592,6 +594,6 @@ describe("nothing broken ever reaches the page", () => {
               shown += 1;
               expect(text, JSON.stringify(form)).not.toMatch(/undefined|NaN|\[object|\bnull\b/);
             }
-    expect(shown).toBe(41 * 5 * 3 * 3 * 4);
+    expect(shown).toBe(41 * 6 * 3 * 3 * 4);
   }, 60_000);
 });

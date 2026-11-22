@@ -8,7 +8,11 @@ export type IndoorLight = "window" | "room" | "lamps" | "office";
 /** What the Scene choice offers: the three outdoor scenes, then indoors. */
 export type AnyScene = Scene | `indoor_${IndoorLight}`;
 export type LowLight = "sun_low" | "sun_just_set" | "dusk" | "street_night" | "home_lamps" | "floodlit";
-export type Subject = "portrait" | "two_people" | "group" | "landscape" | "other";
+/**
+ * What fills the picture, which sets the usual distance. The app names them Portrait, Subject close by, Subject a
+ * few steps away, Something further off, Landscape and Other; the IDs predate the names and stay, as saved frames use them.
+ */
+export type Subject = "portrait" | "two_people" | "group" | "far" | "landscape" | "other";
 export type Goal = "blur" | "sharp" | "moving";
 export type Support = "hand" | "braced" | "surface";
 

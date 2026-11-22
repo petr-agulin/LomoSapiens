@@ -56,8 +56,6 @@ interface Entry {
   depth: number;
   /** Set on an open sheet's own entry. */
   sheet?: true;
-  /** Set on a screen opened from the menu: Back from it opens the menu again on the screen below. */
-  menu?: true;
   /**
    * Which visit to a screen this is, new for every screen opened and kept by its sheets' entries: where the
    * screen was scrolled is kept under it. Missing on entries an older version of the app made.
@@ -87,10 +85,6 @@ const nav = {
   guard: null as { depth: number; ask: () => void } | null,
   /** Set while history steps forward again onto a guarded screen, to ask once it's there. */
   bouncing: false,
-  /** The depth of the screen on show, when it was opened from the menu. */
-  menuAt: null as number | null,
-  /** The depth of a screen just returned to from a place its menu opened, to open the menu again: see useMenuOnReturn. */
-  reopenMenuAt: null as number | null,
   /** The key of the screen on show, and the next one to give: see Entry. */
   key: 0,
   nextKey: 1,
@@ -185,20 +179,6 @@ export function useLeaveGuard(active: boolean, ask: () => void) {
 }
 
 /**
- * For a screen with the menu, Home and the result: whether Back has just returned here from a place picked in
- * its menu. The screen then opens with the menu showing, as it was left, from its very first frame, with no
- * blink of the screen alone first. From further in, Back returns one screen, as everywhere.
- */
-export function useMenuOnReturn(): boolean {
-  // Read as the screen first draws; let go once it is on screen, so it opens the menu only this once.
-  const [returning] = useState(() => nav.reopenMenuAt !== null && nav.reopenMenuAt === nav.depth);
-  useEffect(() => {
-    if (returning) nav.reopenMenuAt = null;
-  }, [returning]);
-  return returning;
-}
-
-/**
  * For a screen's scrolling column: the screen opens scrolled where it was left when Back returns to it, as a
  * browser does between pages. A screen opened anew, or shown in another's place, opens at the top, also when
  * it's drawn in the same column as the screen before it, as the two steps of first setup are.
@@ -242,21 +222,18 @@ export function useScreens() {
   }, []);
 
   /**
-   * Opens a screen. From an open sheet, such as the menu, the screen takes the sheet's place in history.
-   * `from` "menu" marks a place picked in the menu, so Back from it opens the menu again.
+   * Opens a screen. From an open sheet, such as the menu, the screen takes the sheet's place in history, so Back
+   * from a place picked in the menu returns to the screen the menu was opened on, with the menu closed.
    */
   const go = useCallback(
-    (next: AppScreen, from?: "menu") => {
-      const menu = from === "menu" ? { menu: true as const } : {};
+    (next: AppScreen) => {
       const key = newKey();
       if (takeSheetEntry()) {
-        window.history.replaceState({ screen: next, depth: nav.depth, ...menu, key } satisfies Entry, "");
+        window.history.replaceState({ screen: next, depth: nav.depth, key } satisfies Entry, "");
       } else {
         nav.depth += 1;
-        window.history.pushState({ screen: next, depth: nav.depth, ...menu, key } satisfies Entry, "");
+        window.history.pushState({ screen: next, depth: nav.depth, key } satisfies Entry, "");
       }
-      nav.menuAt = from === "menu" ? nav.depth : null;
-      nav.reopenMenuAt = null;
       show(next, key);
     },
     [show],
@@ -272,7 +249,6 @@ export function useScreens() {
       nav.nextKey = Math.max(nav.nextKey, key + 1);
       nav.screen = current.screen;
       nav.depth = current.depth;
-      nav.menuAt = current.menu ? current.depth : null;
       show(current.screen, key);
     } else {
       // The app always opens on Home, a reload too. Going back from Home leaves the app, as on any page.
@@ -283,8 +259,6 @@ export function useScreens() {
       nav.after = null;
       nav.guard = null;
       nav.bouncing = false;
-      nav.menuAt = null;
-      nav.reopenMenuAt = null;
       nav.key = 0;
       nav.scrolls.clear();
       nav.left = null;
@@ -306,11 +280,7 @@ export function useScreens() {
         window.history.forward();
         return;
       }
-      // Back from a place picked in the menu, itself rather than a sheet on it: the menu opens again below.
-      const fromMenu = nav.menuAt !== null && nav.menuAt === nav.depth && depth === nav.depth - 1;
-      nav.reopenMenuAt = null;
       nav.depth = depth;
-      nav.menuAt = saved?.menu ? depth : null;
       const open = nav.sheet;
       if (saved?.sheet && !open) {
         // Forward onto the entry of a sheet closed long ago: step back over it.
@@ -323,7 +293,6 @@ export function useScreens() {
         nav.sheet = null;
         open.close();
       }
-      if (fromMenu && !open) nav.reopenMenuAt = depth;
       const next = nav.after;
       if (nav.depth === 0 && next) {
         nav.after = null;
@@ -343,10 +312,8 @@ export function useScreens() {
   const swap = useCallback(
     (next: AppScreen) => {
       takeSheetEntry();
-      // In the same place in history, so opened from the menu if the screen it replaces was.
-      const menu = nav.menuAt === nav.depth ? { menu: true as const } : {};
       const key = newKey();
-      window.history.replaceState({ screen: next, depth: nav.depth, ...menu, key } satisfies Entry, "");
+      window.history.replaceState({ screen: next, depth: nav.depth, key } satisfies Entry, "");
       show(next, key);
     },
     [show],
@@ -361,7 +328,7 @@ export function useScreens() {
     window.history.go(-Math.min(steps + extra, nav.depth));
   }, []);
 
-  /** Back to Home, as the menu's Home row does. */
+  /** Back to Home, past every screen between, as the menu's Home row does from any screen: Home shows alone. */
   const home = useCallback(() => {
     takeSheetEntry();
     if (nav.depth > 0) window.history.go(-nav.depth);

@@ -51,7 +51,7 @@
         }
       ]
     },
-    "subject": { "enum": ["portrait", "two_people", "group", "landscape", "other"] },
+    "subject": { "enum": ["portrait", "two_people", "group", "far", "landscape", "other"] },
     "subjectDistanceM": { "type": ["number", "null"], "exclusiveMinimum": 0 },
     "goal": { "enum": ["blur", "sharp", "moving"] },
     "lowSun": { "type": "boolean" },

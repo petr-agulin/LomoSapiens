@@ -12,7 +12,7 @@ const text = strings.app.theory;
 export function TheoryList({ query, onQuery, onOpen, onBack }: { query: string; onQuery: (query: string) => void; onOpen: (id: string) => void; onBack: () => void }) {
   const found = findArticles(query);
   return (
-    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack}>{strings.app.back}</Crumb>}>
+    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack} menu="theory">{strings.app.back}</Crumb>}>
       <ScreenTitle title={text.title} line={text.line} />
       <label className="flex min-h-12 items-center gap-2.5 rounded-2xl bg-card px-3.5 text-muted">
         <Icon name="search" size={20} className="flex-none" />
@@ -104,7 +104,7 @@ function Picture({ article }: { article: Article }) {
 export function ArticleScreen({ article, from, onOpen, onBack }: { article: Article; from: string | null; onOpen: (id: string) => void; onBack: () => void }) {
   const crumb = (from && articleById(from)?.title) || text.title;
   return (
-    <Screen top={<Crumb backLabel={text.backTo(crumb)} onBack={onBack}>{crumb}</Crumb>}>
+    <Screen top={<Crumb backLabel={text.backTo(crumb)} onBack={onBack} menu>{crumb}</Crumb>}>
       <article className="flex flex-col gap-3.5 pb-2">
         <header className="flex flex-col gap-1.5 px-0.5 pt-2.5">
           <span className="type-label text-[13px] font-semibold text-muted">{article.topic}</span>

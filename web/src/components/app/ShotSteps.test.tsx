@@ -125,42 +125,61 @@ describe("step 1: what's the light?", () => {
 describe("step 2: what are you shooting?", () => {
   const sunny = withLight({ group: "day", sky: "sun", place: "open" });
 
-  it("lists the five subjects with the usual distances for the lens, and fades Show settings", () => {
+  it("lists the six subjects, named by how much fills the picture, each with its usual distance for the lens, and fades Show settings", () => {
     const page = subject(sunny);
     inOrder(readable(page), [
       "New shot · Step 2 · Subject",
       "What are you shooting?",
       "Distances follow your 40 mm lens.",
-      "Portrait", "One person, head and shoulders · About 1 m",
-      "Two people", "Head and shoulders · About 1.4 m",
-      "Group", "Three or more, standing · About 4 m",
-      "Landscape", "Views, distant buildings · Focus keeps ∞ sharp",
-      "Something else", "You type the distance",
+      "Portrait", "A person with head and shoulders, or a tight shot of any object · About 1 m",
+      "Subject close by", "People waist up, a dog, a vase of flowers · About 1.4 m",
+      "Subject a few steps away", "A person head to toe, a group, a whole car, a street door · About 4 m",
+      "Something further off", "Small in the picture with a lot around it: a boat at the pier, a building façade · About 8 m",
+      "Landscape", "Scenery, distant view · Far, ∞ sharp",
+      "Other", "You type the distance",
       "Show settings",
     ]);
     expect(page).toMatch(/aria-disabled="true"[^>]*>Show settings/);
   });
 
-  it("folds a picked portrait into one card, with its distance, the goals and Sun behind the person", () => {
+  it("gives the distances of the lens on the camera: with 50 mm, each a step further back", () => {
+    const fifty = { ...camera, answers: { ...camera.answers, focalLengthMm: "50" } };
+    inOrder(readable(renderToStaticMarkup(<SubjectStep draft={sunny} camera={fifty} onChange={noop} onBack={noop} onNext={noop} />)), [
+      "Distances follow your 50 mm lens.",
+      "Portrait", "About 1.3 m", "Subject close by", "About 1.8 m", "Subject a few steps away", "About 5 m", "Something further off", "About 10 m",
+    ]);
+  });
+
+  it("starts something further off on everything sharp, offers no sun behind it, and calls 8 m a usual distance", () => {
+    const text = readable(subject(pickSubject(sunny, "far")));
+    inOrder(text, ["You're shooting", "Something further off", "Focus distance", "About 8 m", "Everything sharp", "Usual for this subject"]);
+    expect(text).not.toContain("Sun behind your subject");
+  });
+
+  it("folds a picked portrait into one card, with its distance, the goals and Sun behind your subject", () => {
     const page = subject(pickSubject(sunny, "portrait"));
     inOrder(readable(page), [
-      "You're shooting", "Portrait", "One person, head and shoulders",
+      "You're shooting", "Portrait", "A person with head and shoulders, or a tight shot of any object",
       "Focus distance", "About 1 m", "Change",
       "What matters most in this photo?",
       "Blurred background", "Sharp person, soft background", "Usual for a portrait",
       "Everything sharp", "Near and far both in focus",
       "Moving subject", "Freezes movement: walking people, children, pets",
-      "If it applies", "Sun behind the person", "You face the sun, the people have it at their backs",
+      "If it applies", "Sun behind your subject", "You face the sun; it lights your subject from behind",
       "Show settings",
     ]);
     expect(page).toMatch(/role="radio" aria-checked="true"[^>]*>.{0,1200}?Blurred background/);
     expect(page).not.toContain('aria-disabled="true"');
   });
 
-  it("marks the usual goal for other subjects, and hides Sun behind the person without the sun in view", () => {
+  it("offers Sun behind your subject for a subject close by too, the other close subject", () => {
+    expect(readable(subject(pickSubject(sunny, "two_people")))).toContain("Sun behind your subject");
+  });
+
+  it("marks the usual goal for other subjects, and hides Sun behind your subject without the sun in view", () => {
     const text = readable(subject(pickSubject(withLight({ group: "day", sky: "overcast", place: "open" }), "group")));
     expect(text).toContain("Everything sharp Near and far both in focus Usual for this subject");
-    expect(text).not.toContain("Sun behind the person");
+    expect(text).not.toContain("Sun behind your subject");
   });
 
   it("shows a typed distance as set by you, and a landscape as far, ∞ sharp", () => {
@@ -168,13 +187,17 @@ describe("step 2: what are you shooting?", () => {
     expect(readable(subject(pickSubject(sunny, "landscape")))).toContain("Focus distance Far, ∞ sharp Change");
   });
 
-  it("changes the subject in a sheet that says the goal goes back to its usual one", () => {
-    expect(readable(subject(pickSubject(sunny, "group"), "subjects"))).toContain("Picking another subject resets the goal to its usual one.");
+  it("changes the subject in a sheet with only its title and the six choices, the one picked marked", () => {
+    const sheet = subject(pickSubject(sunny, "group"), "subjects");
+    const inSheet = readable(sheet.slice(sheet.indexOf("role=\"dialog\"")));
+    inOrder(inSheet, ["What are you shooting?", "Portrait", "Subject close by", "Subject a few steps away", "Something further off", "Landscape", "Other"]);
+    expect(inSheet).not.toMatch(/resets|usual one/);
+    expect(sheet).toMatch(/aria-checked="true"[^>]*>.{0,700}?Subject a few steps away/);
   });
 
-  it("asks Something else for its distance first, with Done faded until there is one", () => {
+  it("asks Other for its distance first, with Done faded until there is one", () => {
     const page = subject(pickSubject(sunny, "group"), "other");
-    inOrder(readable(page), ["Something else", "Distance, in metres", "Measure it or pace it out: the focus is set to this distance.", "m", "Done"]);
+    inOrder(readable(page), ["Other", "Distance, in metres", "Measure it or pace it out: the focus is set to this distance.", "m", "Done"]);
     expect(page).toContain('inputMode="decimal"');
     expect(page).toMatch(/aria-disabled="true"[^>]*>Done/);
   });

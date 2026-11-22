@@ -22,13 +22,14 @@ import { ChoiceCard, Crumb, HelpSheet, MainButton, OptionRow, Screen, ScreenTitl
 import { GOAL_ICON, SUBJECT_ICON, SWITCH_ICON } from "./shotIcons.ts";
 
 const text = strings.app.shot;
-const SUBJECTS: Subject[] = ["portrait", "two_people", "group", "landscape", "other"];
+const SUBJECTS: Subject[] = ["portrait", "two_people", "group", "far", "landscape", "other"];
 const GOALS: Goal[] = ["blur", "sharp", "moving"];
 
-/** A subject's line: what it is, and its usual distance with this lens. */
+/** A subject's line: what it is, then its usual distance with this lens; a landscape's is far, with ∞ sharp. */
 function subjectLine(camera: SavedCamera, subject: Subject) {
   const { desc } = text.subjects[subject];
-  return subject === "other" ? desc : `${desc} · ${usualDistanceText(camera, subject)}`;
+  if (subject === "other") return desc;
+  return `${desc} · ${subject === "landscape" ? text.farInfinity : usualDistanceText(camera, subject)}`;
 }
 
 /** The distance sheet: typed in metres, with a comma or a point. Something else only counts once it has one. */
@@ -154,7 +155,7 @@ export function SubjectStep({
 
   return (
     <Screen
-      top={<Crumb backLabel={text.backToLight} onBack={onBack}>{text.stepSubject}</Crumb>}
+      top={<Crumb backLabel={text.backToLight} onBack={onBack} menu>{text.stepSubject}</Crumb>}
       action={
         <MainButton onClick={onNext} disabled={!isComplete(draft)}>
           {text.showSettings}
@@ -227,7 +228,7 @@ export function SubjectStep({
       <span className="flex-[1_0_8px]" />
 
       {open === "subjects" && (
-        <Sheet title={text.subjectTitle} description={text.changeSubjectLine} closeLabel={strings.app.setup.close} onClose={() => setOpen(null)}>
+        <Sheet title={text.subjectTitle} closeLabel={strings.app.setup.close} onClose={() => setOpen(null)}>
           <div role="radiogroup" aria-labelledby="sheet-title" className="flex flex-col gap-1">
             {subjectRows(false)}
           </div>

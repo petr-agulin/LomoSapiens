@@ -54,7 +54,7 @@ describe("a roll's frames", () => {
   });
 
   it("gives the light and the subject when as advised, the advice when not, and the note", () => {
-    inOrder(page, ["Frame 1", "Sun · Something else", "Frame 12", "Advised f/8 · 1/125 · 3 m", "Anna by the window", "Frame 13", "Sun · Something else"]);
+    inOrder(page, ["Frame 1", "Sun · Other", "Frame 12", "Advised f/8 · 1/125 · 3 m", "Anna by the window", "Frame 13", "Sun · Other"]);
   });
 });
 
@@ -69,7 +69,7 @@ describe("a frame's page", () => {
       "Frame 12", "3 Nov 2026, 10:20",
       "You set", "Frame 12 of 36", "ISO 400 colour",
       "Advised f/8 · 1/125 · 3 m", "1 step more light than advised",
-      "Your shot", "Sun", "Open terrain", "Something else", "Everything sharp", "By hand",
+      "Your shot", "Sun", "Open terrain", "Other", "Everything sharp", "By hand",
       "Shot note", "Anna by the window",
       "Change this frame", "Delete this frame",
     ]);

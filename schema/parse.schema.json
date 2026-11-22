@@ -30,7 +30,7 @@
             "lowlight": { "enum": ["sun_low", "sun_just_set", "dusk", "street_night", "home_lamps", "floodlit", null] }
           }
         },
-        "subject": { "enum": ["portrait", "two_people", "group", "landscape", "other", null] },
+        "subject": { "enum": ["portrait", "two_people", "group", "far", "landscape", "other", null] },
         "subjectDistanceM": { "type": ["number", "null"], "exclusiveMinimum": 0 },
         "goal": { "enum": ["blur", "sharp", "moving", null] },
         "lowSun": { "type": ["boolean", "null"] },

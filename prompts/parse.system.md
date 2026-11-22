@@ -65,7 +65,7 @@ An apartment, house or room with no mention of a window or lamps is indoor_room 
 
 ## Subject and goal
 
-- subject: portrait (one person, close), two_people, group, landscape, or other when it is something else and the photographer gives a distance.
+- subject: portrait (a person's head and shoulders, or a tight shot of any object, about 1 m), two_people (a subject close by: people waist up, a dog, a vase), group (a few steps away: a person head to toe, a group, a car), far (further off: small in the picture with a lot around it, such as a boat or a building front), landscape, or other when the photographer gives a distance for anything else.
 - subjectDistanceM: the distance to the subject in metres, only if said. "two steps" is 1.5, "arm's length" is 0.7, "20 metres" is 20. Ignore the distance to the background.
 - goal: blur for a blurred background, sharp for everything sharp, moving for a moving subject. Leave it null if not said, or if the photographer has no preference.
 

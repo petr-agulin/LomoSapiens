@@ -114,6 +114,15 @@ describe("a roll's page", () => {
     inOrder(page("r2"), ["Box", "Spare · 3 – 14 Nov 2026", "0 of 24 recorded", "Roll details", "ISO 100 black and white", "Recorded frames", "No frames were recorded on this roll."]);
     expect(page("r2")).not.toMatch(/Add a frame|Record this shot/);
   });
+
+  it("keeps each frame's hidden caption inside the scrolling column, which places it, so the page itself never scrolls", () => {
+    const html = renderToStaticMarkup(<RollPage state={state} rollId="r1" via="rolls" onBack={noop} onDetails={noop} onFrame={noop} onAddFrame={noop} />);
+    const column = html.indexOf("<main");
+    expect(html.slice(column)).toMatch(/^<main class="relative [^"]*overflow-y-auto/);
+    const caption = html.indexOf('<span class="sr-only">Frame 1</span>');
+    expect(caption).toBeGreaterThan(column);
+    expect(caption).toBeLessThan(html.indexOf("</main>"));
+  });
 });
 
 describe("Roll details", () => {

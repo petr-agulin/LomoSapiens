@@ -8,7 +8,7 @@ It's made for beginners who shoot film without a light meter, and who otherwise 
 
 **Try it: [lomosapiens.pages.dev](https://lomosapiens.pages.dev).** Open it on your phone and add it to your home screen. On a computer it opens in a phone-sized frame.
 
-<p align="center"><img src="docs/screenshots/demo.svg" width="384" alt="LomoSapiens on a phone: switching from dark to the Archive paper look in Settings, analysing a snowy landscape in low sun with its wide sharp zone, recording it as frame 10 of a colour roll, marking an earlier frame Too light after developing, with a note, and opening the Theory article on the sharp zone"></p>
+<p align="center"><img src="docs/screenshots/demo.svg" width="384" alt="LomoSapiens on a phone: switching from dark to the Archive paper look in Settings, analysing a snowy landscape in low sun with its wide sharp zone, recording it as frame 10 of a colour roll, marking an earlier frame Too light after developing, with a note, going Home from the menu, and opening the Theory article on the sharp zone"></p>
 
 <table>
   <tr>
@@ -38,7 +38,7 @@ It's made for beginners who shoot film without a light meter, and who otherwise 
 
 ## Key features
 
-- **Analysing a shot.** The light: the sky and where you are by day, twilight and night, or indoors. The subject: a portrait, two people, a group, a landscape or something else, at its usual distance or one you type. And what matters most: a moving subject, a blurred background or everything sharp. The result gives the aperture, the shutter speed and the focus distance as your camera marks them, the sharp zone, how to hold the camera, any warnings, and "How the app got there", step by step. Estimates are marked as such.
+- **Analysing a shot.** The light: the sky and where you are by day, twilight and night, or indoors. What you're shooting, named by how much fills the picture: a portrait, a subject close by, a subject a few steps away, something further off, a landscape or other, at its usual distance for your lens or one you type. And what matters most: a moving subject, a blurred background or everything sharp. The result gives the aperture, the shutter speed and the focus distance as your camera marks them, the sharp zone, how to hold the camera, any warnings, and "How the app got there", step by step. Estimates are marked as such.
 - **Your cameras.** Add as many as you have, each described once by its limits: its widest and smallest aperture, its lens's focal length, its fastest and slowest shutter speeds, and whether it has B. "Not sure" picks a value almost every camera has. There is no list of camera models, and the advice never asks for a setting your camera doesn't have. One camera is in use for new shots, and a camera can be added before it has film.
 - **Rolls.** Load a roll into a camera with its film speed, colour or black and white, its length (24, 36 or any other) and, if you like, a name. Finish it when it's done: finished rolls stay, with their frames. Home shows the last frame you recorded.
 - **Recording a frame.** "Record this shot" on the result keeps the frame number, the settings you actually used beside the advice, a note and a photo of the scene. A frame you forgot to record can be added later from the roll's page.

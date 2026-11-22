@@ -2,14 +2,20 @@
 import type { ReactNode } from "react";
 import { Icon, PathIcon, type IconName } from "./icons.tsx";
 import { useDragToClose } from "./dragToClose.ts";
+import { MenuButton, type MenuItem } from "./MenuSheet.tsx";
 import { useBackCloses, useScrollMemory } from "./navigation.ts";
 
-/** An inner screen's top row: back, and a crumb saying where you are. */
-export function Crumb({ backLabel, onBack, children }: { backLabel: string; onBack: () => void; children: ReactNode }) {
+/**
+ * An inner screen's top row: back, a crumb saying where you are, and the menu button, unless the screen is a form,
+ * whose way out is Save or Back, so that a jump elsewhere never loses what's typed. `menu` is the menu's place
+ * this screen is, or true for a screen inside a place, such as a roll's page.
+ */
+export function Crumb({ backLabel, onBack, menu, children }: { backLabel: string; onBack: () => void; menu?: MenuItem | true; children: ReactNode }) {
   return (
     <>
       <RoundButton icon="back" label={backLabel} onClick={onBack} />
-      <span className="type-label flex-1 text-[13px] text-muted">{children}</span>
+      <span className="type-label min-w-0 flex-1 text-[13px] text-muted [overflow-wrap:anywhere]">{children}</span>
+      {menu && <MenuButton current={menu === true ? null : menu} />}
     </>
   );
 }
@@ -248,8 +254,11 @@ export function Screen({ top, children, action }: { top: ReactNode; children: Re
   return (
     <div className="mx-auto flex h-[var(--app-h)] max-w-[480px] flex-col bg-bg text-ink">
       <div className="flex items-center gap-2 px-4 pt-4 pb-1.5">{top}</div>
-      {/* Nothing in the column shrinks: when it is taller than the screen, it scrolls instead. Back returns to where it was scrolled. */}
-      <main ref={column} className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-4 [scrollbar-width:none] [&>*]:shrink-0">
+      {/* Nothing in the column shrinks: when it is taller than the screen, it scrolls instead. Back returns to where it was scrolled.
+          The column is the box that anything positioned inside it, such as a frame row's hidden caption, is placed in, so it
+          scrolls with the column and is cut at its edge. Placed by the page instead, a caption far down a long roll made the
+          page itself taller than the phone's screen: a swipe past the list's end then scrolled the whole app up. */}
+      <main ref={column} className="relative flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-4 [scrollbar-width:none] [&>*]:shrink-0">
         {children}
       </main>
       {action && <div className="flex flex-col px-4 pt-2.5 pb-3.5">{action}</div>}

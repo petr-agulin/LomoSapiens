@@ -120,7 +120,7 @@ export function LightStep({
 
   return (
     <Screen
-      top={<Crumb backLabel={text.backToHome} onBack={onBack}>{text.stepLight}</Crumb>}
+      top={<Crumb backLabel={text.backToHome} onBack={onBack} menu>{text.stepLight}</Crumb>}
       action={
         <MainButton onClick={onNext} disabled={!draft.light}>
           {text.next}

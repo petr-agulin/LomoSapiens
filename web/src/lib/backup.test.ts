@@ -39,6 +39,14 @@ describe("a backup file", () => {
     expect(readBackup(file)).toEqual({ state, photos, savedAt: "2026-11-14T15:42" });
   });
 
+  it("keeps every subject, Something further off included, in a frame and in the last shot", () => {
+    let far = recordFrame(state, { ...frame("r2", 2), answers: { ...answers, subject: "far", distanceM: null } }, "2026-11-06T09:40").state;
+    far = setLastShot(far, { answers: { ...answers, subject: "far", distanceM: null }, result: advice });
+    const read = readBackup(JSON.stringify(makeBackup(far, photos, "2026-11-14T15:42")));
+    expect(read).toEqual({ state: far, photos, savedAt: "2026-11-14T15:42" });
+    expect(read && "state" in read ? read.state.frames.map((saved) => saved.answers.subject) : []).toEqual(["group", "group", "far"]);
+  });
+
   it("counts what it holds, for the question before restoring", () => {
     expect(backupCounts(state)).toEqual({ cameras: 2, rolls: 2, frames: 2 });
     expect(backupCounts(finishRoll(state, "c1", "2026-11-07"))).toEqual({ cameras: 2, rolls: 2, frames: 2 });

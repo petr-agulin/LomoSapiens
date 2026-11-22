@@ -185,7 +185,8 @@ const PRACTICE: Record<string, () => string> = {
   // Wikipedia, "Pace (unit)": a double step is about 1.5 m. Not the engine's, so it is the source's figure.
   "focusing|Two walking steps": () => "About 1.5 m",
   "focusing|40 mm, portrait": () => `About ${usualDistanceM(LENS_40, "portrait")} m`,
-  "focusing|40 mm, group": () => `About ${usualDistanceM(LENS_40, "group")} m`,
+  "focusing|40 mm, a subject a few steps away": () => `About ${usualDistanceM(LENS_40, "group")} m`,
+  "focusing|40 mm, something further off": () => `About ${usualDistanceM(LENS_40, "far")} m`,
   "focusing|40 mm, landscape at f/16": () => `${landscapeFocus(LENS_40, "16")} m`,
   "holding|By hand": () => bySupport("hand"),
   "holding|Braced": () => bySupport("braced"),
@@ -378,7 +379,7 @@ describe("the numbers in the articles are the app's own", () => {
   });
 
   it("draw the usual distances of the subject step, and the slowest speed for each hold", () => {
-    expect(bigs("focusing")).toEqual([...(["portrait", "two_people", "group"] as const).map((subject) => String(usualDistanceM(LENS_40, subject))), "∞"]);
+    expect(bigs("focusing")).toEqual([...(["portrait", "two_people", "group", "far"] as const).map((subject) => String(usualDistanceM(LENS_40, subject))), "∞"]);
     expect(bigs("holding")).toEqual([slowestShutter("hand", LENS_40), slowestShutter("braced", LENS_40), "Any"]);
   });
 

@@ -136,13 +136,13 @@ describe("why the values are estimated (ENGINE_SPEC section 12a)", () => {
   it("puts every light reason under aperture and shutter speed, in order", () => {
     const snow = run(shot({ group: "day", sky: "sun_haze", place: "snow_sand" }, { lowSun: true, sunBehind: true, distanceM: 2 }));
     expect(estimateExplained(snow.conditions, snow.result)).toEqual({
-      reasons: "snow or sand, not full sun · hazy sun behind the person · low sun",
+      reasons: "snow or sand, not full sun · hazy sun behind your subject · low sun",
       groups: [
         {
           title: "Aperture and shutter speed",
           text:
             "The published table has snow and sand only in full sun, so the app uses its own value. " +
-            "The published extra light for sun behind the person is for full sun only, so the app uses its own value. " +
+            "The published extra light for sun behind your subject is for full sun only, so the app uses its own value. " +
             "The extra step for low sun is the app's own rule, not a published value.",
         },
       ],
@@ -152,7 +152,7 @@ describe("why the values are estimated (ENGINE_SPEC section 12a)", () => {
   it("names the subject and the lens in the distance sentence", () => {
     const fifty = run(shot({ group: "day", sky: "sun", place: "open" }, { subject: "two_people", goal: "sharp" }), "hand", camera(400, { ...compact, focalLengthMm: "50" }));
     expect(estimateExplained(fifty.conditions, fifty.result)?.groups).toEqual([
-      { title: "Focus distance", text: "1.8 m is the usual distance for two people with your 50 mm lens, not measured. Set your own distance to remove this." },
+      { title: "Focus distance", text: "1.8 m is the usual distance for a subject close by with your 50 mm lens, not measured. Set your own distance to remove this." },
     ]);
   });
 

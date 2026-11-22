@@ -98,7 +98,7 @@ export function estimateExplained(conditions: Conditions, result: Recommendation
   if (light.length > 0) groups.push({ title: text.estimateLight, text: light.map((reason) => engineText.estimate.why[reason]).join(" ") });
   const { subject } = conditions;
   const { meters } = result.final.focus;
-  if (result.estimates.includes("usual_distance") && meters !== null && (subject === "portrait" || subject === "two_people" || subject === "group")) {
+  if (result.estimates.includes("usual_distance") && meters !== null && (subject === "portrait" || subject === "two_people" || subject === "group" || subject === "far")) {
     groups.push({ title: text.estimateFocus, text: engineText.estimate.usualDistance(meters, subject, conditions.camera.focalLengthMm) });
   }
   return { reasons: result.estimates.map((reason) => engineText.estimate.label[reason]).join(" · "), groups };

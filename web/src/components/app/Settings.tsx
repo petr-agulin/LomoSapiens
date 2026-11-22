@@ -64,7 +64,7 @@ function HoldSheet({ hold, onPick, onClose }: { hold: Support; onPick: (hold: Su
 /** Every camera, the one in use inverted, then adding one. */
 export function CamerasHome({ state, onBack, onCamera, onAdd }: { state: AppState; onBack: () => void; onCamera: (id: string) => void; onAdd: () => void }) {
   return (
-    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack}>{strings.app.back}</Crumb>}>
+    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack} menu="cameras">{strings.app.back}</Crumb>}>
       <ScreenTitle title={camerasText.title} line={camerasText.line} />
       {state.cameras.map((camera) => (
         <CameraCard
@@ -137,7 +137,7 @@ export function SettingsHome({
 }) {
   const [holding, setHolding] = useState(holdOpen);
   return (
-    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack}>{strings.app.back}</Crumb>}>
+    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack} menu="settings">{strings.app.back}</Crumb>}>
       <ScreenTitle title={text.title} line={text.line} />
 
       <SectionLabel>{text.shooting}</SectionLabel>
@@ -218,7 +218,7 @@ export function CameraPage({
 
   return (
     <Screen
-      top={<Crumb backLabel={cameraText.backToCameras} onBack={onBack}>{cameraText.crumb}</Crumb>}
+      top={<Crumb backLabel={cameraText.backToCameras} onBack={onBack} menu>{cameraText.crumb}</Crumb>}
       action={inUse ? undefined : <MainButton onClick={onUse}>{cameraText.use}</MainButton>}
     >
       <ScreenTitle title={camera.name} line={inUse ? cameraText.inUse : cameraText.notInUse} />

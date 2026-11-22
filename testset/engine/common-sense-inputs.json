@@ -7,7 +7,7 @@
   "lowlight": ["sun_low", "sun_just_set", "dusk", "street_night", "home_lamps", "floodlit"],
   "indoorFollowingDaylight": ["window", "room"],
   "indoorFixed": ["lamps", "office"],
-  "subject": ["portrait", "two_people", "group", "landscape"],
+  "subject": ["portrait", "two_people", "group", "far", "landscape"],
   "goal": [null, "blur", "sharp", "moving"],
   "support": [null, "hand", "braced", "surface"]
 }

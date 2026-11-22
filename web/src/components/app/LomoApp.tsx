@@ -19,7 +19,6 @@ import {
   loadRoll,
   nextFrameNumber,
   recordFrame,
-  recordedCount,
   renameCamera,
   setAnswer,
   setHold,
@@ -29,12 +28,11 @@ import {
 } from "../../lib/store.ts";
 import { articleById } from "../../lib/kb.ts";
 import { browserStore } from "../../lib/settings.ts";
-import { strings } from "../../lib/strings.ts";
 import { applyTheme, phoneTheme, readTheme, saveTheme, type ThemeChoice } from "../../lib/theme.ts";
 import { AboutScreen } from "./About.tsx";
 import { Home } from "./Home.tsx";
 import { LightStep } from "./LightStep.tsx";
-import type { MenuItem } from "./MenuSheet.tsx";
+import { MenuContext, menuLines, type MenuItem } from "./MenuSheet.tsx";
 import { useScreens } from "./navigation.ts";
 import { Result } from "./Result.tsx";
 import { BackupOffer, RecordsSection } from "./Backup.tsx";
@@ -189,391 +187,393 @@ export default function LomoApp() {
   };
 
   /**
-   * The menu's places. Back from any of them returns where the menu was opened, with the
-   * menu open again. Theory opens on its whole list.
+   * The menu's places, from the menu on any screen. Home goes back to Home past every screen between, and shows
+   * it alone. Another place opens over the screen the menu was opened on, so Back returns there, as from any
+   * screen. Theory opens on its whole list.
    */
   const openMenuItem = (item: MenuItem) => {
     if (item === "home") return home();
     if (item === "theory") setTheoryQuery("");
-    go({ name: item }, "menu");
+    go({ name: item });
   };
 
-  if (screen.name === "setup") {
-    const adding = screen.adding === true;
-    return (
-      <Setup
-        step={screen.step}
-        adding={adding}
-        draft={draft}
-        onChange={setDraft}
-        onBack={back}
-        onNext={() => {
-          if (screen.step === "camera") return go({ name: "setup", step: "film", ...(adding ? { adding } : {}) });
-          const film = draftRoll(draft);
-          if (!film) return;
-          update((current) => addCamera(current, { name: draft.name, answers: draft.answers, film }).state);
-          if (adding) return backBy(2);
-          setShot(newShotDraft(null));
-          restartAt({ name: "light" });
-        }}
-        onWithoutFilm={() => {
-          // A camera with no film yet: a roll is loaded later, from its page or the next shot.
-          update((current) => addCamera(current, { name: draft.name, answers: draft.answers, film: null }).state);
-          // Adding ends back where it began; the first setup ends on Home, as there's nothing to shoot on yet.
-          if (adding) backBy(2);
-          else home();
-        }}
-      />
-    );
-  }
-
-  const list = <TheoryList query={theoryQuery} onQuery={setTheoryQuery} onOpen={(id) => go({ name: "article", id })} onBack={back} />;
-  if (screen.name === "theory") return list;
-
-  if (screen.name === "about") return <AboutScreen onBack={back} />;
-
-  if (screen.name === "article") {
-    const article = articleById(screen.id);
-    // An article the app no longer has, such as after an update, shows the list instead.
-    if (!article) return list;
-    return (
-      <ArticleScreen
-        key={article.id}
-        article={article}
-        from={screen.from ?? null}
-        onOpen={(id) => go({ name: "article", id, from: article.id })}
-        onBack={back}
-      />
-    );
-  }
-
-  // A camera's page and its film. A camera that is gone, such as after deleting it, shows Settings instead.
-  const shown = screen.name === "camera" || screen.name === "film" ? state.cameras.find((saved) => saved.id === screen.id) : undefined;
-
-  if (shown && screen.name === "camera") {
-    return withOffer(
-      <CameraPage
-        key={shown.id}
-        state={state}
-        camera={shown}
-        onBack={back}
-        onRename={(name) => update((current) => renameCamera(current, shown.id, name))}
-        onAnswer={(key, value) => update((current) => setAnswer(current, shown.id, key, value))}
-        onRoll={() => shown.film && go({ name: "rollPage", id: shown.film.id, via: "camera" })}
-        onLoadNew={() => startLoading(shown)}
-        onDelete={() => {
-          const last = state.cameras.length === 1;
-          update((current) => deleteCamera(current, shown.id));
-          // The last camera gone, the app starts again from first setup, on Home.
-          if (last) home();
-          else back();
-        }}
-        onUse={() => update((current) => setInUse(current, shown.id))}
-      />,
-    );
-  }
-
-  if (shown && screen.name === "film") {
-    return (
-      <LoadRoll
-        cameraName={shown.name}
-        draft={roll}
-        onChange={setRoll}
-        onBack={back}
-        onLoad={() => {
-          const film = draftRoll(roll);
-          if (!film) return;
-          update((current) => loadRoll(current, shown.id, film));
-          // A roll that was in the camera is finished now: offer a backup.
-          if (shown.film) setOfferNext(true);
-          back();
-        }}
-      />
-    );
-  }
-
-  // A recorded frame, and changing it. A frame that is gone shows Rolls instead.
-  const frameShown = screen.name === "frame" || screen.name === "frameEdit" ? state.frames.find((saved) => saved.id === screen.id) : undefined;
-  const frameCamera = frameShown && state.cameras.find((saved) => saved.id === findRoll(state, frameShown.rollId)?.cameraId);
-
-  if (frameShown && screen.name === "frame") {
-    return (
-      <FramePage
-        key={frameShown.id}
-        state={state}
-        frameId={frameShown.id}
-        onBack={back}
-        onEdit={() => {
-          setRecord(recordDraftOfFrame(frameShown));
-          go({ name: "frameEdit", id: frameShown.id });
-        }}
-        onDelete={() => {
-          update((current) => deleteFrame(current, frameShown.id));
-          back();
-        }}
-        onNeighbour={(id) => swap({ name: "frame", id })}
-        onLabels={(labels) => update((current) => editFrame(current, frameShown.id, { labels }))}
-        onDevelopedNote={(note) => update((current) => editFrame(current, frameShown.id, { developedNote: note }))}
-      />
-    );
-  }
-
-  if (frameShown && screen.name === "frameEdit" && record) {
-    const original = recordDraftOfFrame(frameShown);
-    return (
-      <RecordShot
-        camera={frameCamera ?? ANY_CAMERA}
-        advice={frameShown.advice}
-        taken={framesOn(state, frameShown.rollId)
-          .filter((saved) => saved.id !== frameShown.id)
-          .map((saved) => saved.number)}
-        draft={record}
-        onChange={setRecord}
-        onBack={back}
-        editing={{ number: frameShown.number }}
-        unsaved={JSON.stringify(record) !== JSON.stringify(original)}
-        onPhoto={(key) => setRecord((current) => current && { ...current, photo: key })}
-        onSave={() => {
-          const changed = toFrameDraft(record, frameShown.rollId, frameShown.advice, frameShown.answers, frameShown.hold);
-          if (!changed) return;
-          update((current) => editFrame(current, frameShown.id, { number: changed.number, set: changed.set, note: changed.note, photo: changed.photo }));
-          back();
-        }}
-      />
-    );
-  }
-
-  // Rolls. A roll that is gone, such as after deleting it, shows Rolls instead.
-  const rollShown = screen.name === "rollPage" || screen.name === "rollDetails" ? findRoll(state, screen.id) : null;
-
-  if (rollShown && screen.name === "rollPage") {
-    return withOffer(
-      <RollPage
-        key={screen.id}
-        state={state}
-        rollId={screen.id}
-        via={screen.via ?? "rolls"}
-        onBack={back}
-        onDetails={() => openDetails(screen.id)}
-        onFrame={(id) => go({ name: "frame", id })}
-        onAddFrame={() => startAddingFrame(screen.id)}
-      />,
-    );
-  }
-
-  if (rollShown && screen.name === "rollDetails") {
-    const id = screen.id;
-    return (
-      <RollDetails
-        key={id}
-        state={state}
-        rollId={id}
-        draft={roll}
-        onChange={setRoll}
-        dates={rollDates}
-        onDates={setRollDates}
-        onBack={back}
-        onDone={() => {
-          const film = draftRoll(roll);
-          if (!film) return;
-          const finishedOn = rollShown.finishedOn !== null && rollDates.finishedOn ? { finishedOn: rollDates.finishedOn } : {};
-          update((current) => editRoll(current, id, { ...film, loadedOn: rollDates.loadedOn, ...finishedOn }));
-          back();
-        }}
-        onFinish={() => {
-          update((current) => finishRoll(current, rollShown.cameraId));
-          setOfferNext(true);
-          back();
-        }}
-        onDelete={() => {
-          update((current) => deleteRoll(current, id));
-          // The roll's page is gone too: back to where it was opened from.
-          backBy(2);
-        }}
-      />
-    );
-  }
-
-  if (["rolls", "rollPage", "rollDetails", "frame", "frameEdit"].includes(screen.name)) {
-    return withOffer(
-      <RollsHome
-        state={state}
-        onBack={back}
-        onRoll={(id) => go({ name: "rollPage", id })}
-        onLoad={(cameraId) => {
-          const target = state.cameras.find((saved) => saved.id === cameraId);
-          if (target) startLoading(target);
-        }}
-      />,
-    );
-  }
-
-  if (screen.name === "settings") {
-    return (
-      <SettingsHome
-        state={state}
-        onBack={back}
-        onHold={(hold) => update((current) => setHold(current, hold))}
-        theme={theme}
-        phoneTheme={phoneTheme()}
-        onTheme={pickTheme}
-        records={
-          <RecordsSection
-            lastBackup={lastBackup}
-            onSave={saveBackup}
-            onRead={readBackupFile}
-            onRestore={async (backup) => {
-              // The photos first, under their own keys, then the data that points to them.
-              await restoreBackupPhotos(backup);
-              update(() => backup.state);
-              setLastBackup(backup.savedAt.slice(0, 10));
-            }}
-          />
-        }
-      />
-    );
-  }
-
-  if (screen.name === "cameras" || screen.name === "camera" || screen.name === "film") {
-    return <CamerasHome state={state} onBack={back} onCamera={(id) => go({ name: "camera", id })} onAdd={startAdding} />;
-  }
-
-  // The shot's screens need the camera in use. Without one, such as after going Forward past a reset, show Home.
-  if (camera && screen.name === "roll") {
-    return (
-      <LoadRoll
-        cameraName={camera.name}
-        draft={roll}
-        onChange={setRoll}
-        onBack={back}
-        onLoad={() => {
-          const film = draftRoll(roll);
-          if (!film) return;
-          update((current) => loadRoll(current, camera.id, film));
-          restartAt({ name: "light" });
-        }}
-      />
-    );
-  }
-
-  if (shotCamera && screen.name === "light") {
-    return (
-      <LightStep
-        draft={shot}
-        onPick={(light) => setShot(pickLight(shot, light))}
-        onToggle={(key) => setShot(toggle(shot, key))}
-        onBack={back}
-        onNext={() => go({ name: "subject", ...along })}
-      />
-    );
-  }
-
-  if (shotCamera && screen.name === "subject") {
-    return (
-      <SubjectStep
-        draft={shot}
-        camera={shotCamera}
-        onChange={setShot}
-        onBack={back}
-        onNext={() => {
-          const answers = toAnswers(shot);
-          const conditions = answers && toConditions(answers, shotCamera, state.hold);
-          if (!answers || !conditions) return;
-          const result = recommend(conditions);
-          // A new result: nothing is recorded from it yet.
-          setLastRecorded(null);
-          // Home's last shot is the last one asked for now, not a frame added later.
-          if (!isRefusal(result) && addTo === null) {
-            const { aperture, shutter, bulbSeconds, focus } = result.final;
-            update((current) => setLastShot(current, { answers, result: { aperture, shutter, bulbSeconds, focus } }));
-          }
-          go({ name: "result", ...along });
-        }}
-      />
-    );
-  }
-
-  if (shotCamera && (screen.name === "result" || screen.name === "record")) {
-    const answers = toAnswers(shot);
-    const conditions = answers && toConditions(answers, shotCamera, state.hold);
-    const result = conditions && recommend(conditions);
-    const roll = shotCamera.film;
-    // The advice as given, kept with every frame recorded from it.
-    const advice = result && !isRefusal(result) ? { aperture: result.final.aperture, shutter: result.final.shutter, bulbSeconds: result.final.bulbSeconds, focus: result.final.focus } : null;
-
-    if (screen.name === "record" && answers && advice && roll && record) {
+  /** The screen on show. */
+  const screenFor = (): React.JSX.Element => {
+    if (screen.name === "setup") {
+      const adding = screen.adding === true;
       return (
-        <RecordShot
-          camera={shotCamera}
-          advice={advice}
-          taken={framesOn(state, roll.id).map((frame) => frame.number)}
-          draft={record}
-          onChange={setRecord}
+        <Setup
+          step={screen.step}
+          adding={adding}
+          draft={draft}
+          onChange={setDraft}
           onBack={back}
-          earlier={addTo !== null}
-          unsaved={record.note.trim() !== "" || record.photo !== (recordStart?.photo ?? null)}
-          samePhotoAs={record.photo && lastRecorded && record.photo === lastRecorded.photo ? lastRecorded.number : null}
-          onPhoto={(key) => {
-            clearInterruptedRecording();
-            setRecord((current) => current && { ...current, photo: key });
+          onNext={() => {
+            if (screen.step === "camera") return go({ name: "setup", step: "film", ...(adding ? { adding } : {}) });
+            const film = draftRoll(draft);
+            if (!film) return;
+            update((current) => addCamera(current, { name: draft.name, answers: draft.answers, film }).state);
+            if (adding) return backBy(2);
+            setShot(newShotDraft(null));
+            restartAt({ name: "light" });
           }}
-          // Kept for a shot recorded on the result, which picks up again on the result. A frame added from its
-          // roll is kept no more than a changed frame is: the phone mostly offers its photos then, not the camera.
-          onCameraOpen={addTo === null ? () => keepInterruptedRecording({ shot, record, recordStart, lastRecorded }) : undefined}
-          onSave={() => {
-            const frame = toFrameDraft(record, roll.id, advice, answers, state.hold);
-            if (!frame) return;
-            update((current) => recordFrame(current, frame).state);
-            // Added from the roll's page: back there, past the result and the two steps.
-            if (addTo !== null) return backBy(4);
-            setLastRecorded({ number: frame.number, photo: frame.photo });
+          onWithoutFilm={() => {
+            // A camera with no film yet: a roll is loaded later, from its page or the next shot.
+            update((current) => addCamera(current, { name: draft.name, answers: draft.answers, film: null }).state);
+            // Adding ends back where it began; the first setup ends on Home, as there's nothing to shoot on yet.
+            if (adding) backBy(2);
+            else home();
+          }}
+        />
+      );
+    }
+
+    const list = <TheoryList query={theoryQuery} onQuery={setTheoryQuery} onOpen={(id) => go({ name: "article", id })} onBack={back} />;
+    if (screen.name === "theory") return list;
+
+    if (screen.name === "about") return <AboutScreen onBack={back} />;
+
+    if (screen.name === "article") {
+      const article = articleById(screen.id);
+      // An article the app no longer has, such as after an update, shows the list instead.
+      if (!article) return list;
+      return (
+        <ArticleScreen
+          key={article.id}
+          article={article}
+          from={screen.from ?? null}
+          onOpen={(id) => go({ name: "article", id, from: article.id })}
+          onBack={back}
+        />
+      );
+    }
+
+    // A camera's page and its film. A camera that is gone, such as after deleting it, shows Settings instead.
+    const shown = screen.name === "camera" || screen.name === "film" ? state.cameras.find((saved) => saved.id === screen.id) : undefined;
+
+    if (shown && screen.name === "camera") {
+      return withOffer(
+        <CameraPage
+          key={shown.id}
+          state={state}
+          camera={shown}
+          onBack={back}
+          onRename={(name) => update((current) => renameCamera(current, shown.id, name))}
+          onAnswer={(key, value) => update((current) => setAnswer(current, shown.id, key, value))}
+          onRoll={() => shown.film && go({ name: "rollPage", id: shown.film.id, via: "camera" })}
+          onLoadNew={() => startLoading(shown)}
+          onDelete={() => {
+            const last = state.cameras.length === 1;
+            update((current) => deleteCamera(current, shown.id));
+            // The last camera gone, the app starts again from first setup, on Home.
+            if (last) home();
+            else back();
+          }}
+          onUse={() => update((current) => setInUse(current, shown.id))}
+        />,
+      );
+    }
+
+    if (shown && screen.name === "film") {
+      return (
+        <LoadRoll
+          cameraName={shown.name}
+          draft={roll}
+          onChange={setRoll}
+          onBack={back}
+          onLoad={() => {
+            const film = draftRoll(roll);
+            if (!film) return;
+            update((current) => loadRoll(current, shown.id, film));
+            // A roll that was in the camera is finished now: offer a backup.
+            if (shown.film) setOfferNext(true);
             back();
           }}
         />
       );
     }
 
-    if (answers && conditions && result) {
+    // A recorded frame, and changing it. A frame that is gone shows Rolls instead.
+    const frameShown = screen.name === "frame" || screen.name === "frameEdit" ? state.frames.find((saved) => saved.id === screen.id) : undefined;
+    const frameCamera = frameShown && state.cameras.find((saved) => saved.id === findRoll(state, frameShown.rollId)?.cameraId);
+
+    if (frameShown && screen.name === "frame") {
       return (
-        <Result
-          camera={shotCamera}
-          hold={state.hold}
-          answers={answers}
-          conditions={conditions}
-          result={result}
-          onMenu={openMenuItem}
-          // From a frame being added too: a new shot, with the camera in use, adding nothing.
-          onNewShot={startShot}
-          onRecord={
-            advice && roll
-              ? () => {
-                  // Another attempt starts with the last one's photo.
-                  const start = recordDraftFrom(advice, nextFrameNumber(state, roll.id), lastRecorded?.photo ?? null);
-                  setRecord(start);
-                  setRecordStart(start);
-                  go({ name: "record", ...along });
-                }
-              : undefined
-          }
-          recordedFrame={lastRecorded?.number ?? null}
-          // The menu's camera and roll are the ones in use, also while adding a frame to another camera's roll.
-          inUseName={camera?.name}
-          rollLine={camera?.film ? strings.app.rolls.inUse(recordedCount(state, camera.film.id), camera.film.frames) : null}
+        <FramePage
+          key={frameShown.id}
+          state={state}
+          frameId={frameShown.id}
+          onBack={back}
+          onEdit={() => {
+            setRecord(recordDraftOfFrame(frameShown));
+            go({ name: "frameEdit", id: frameShown.id });
+          }}
+          onDelete={() => {
+            update((current) => deleteFrame(current, frameShown.id));
+            back();
+          }}
+          onNeighbour={(id) => swap({ name: "frame", id })}
+          onLabels={(labels) => update((current) => editFrame(current, frameShown.id, { labels }))}
+          onDevelopedNote={(note) => update((current) => editFrame(current, frameShown.id, { developedNote: note }))}
         />
       );
     }
-  }
 
-  return (
-    <Home
-      state={state}
-      onStart={() => {
-        if (isSetUp(state)) return startShot();
-        setDraft(newDraft());
-        go({ name: "setup", step: "camera" });
-      }}
-      onMenu={openMenuItem}
-      onFrame={(id) => go({ name: "frame", id })}
-    />
-  );
+    if (frameShown && screen.name === "frameEdit" && record) {
+      const original = recordDraftOfFrame(frameShown);
+      return (
+        <RecordShot
+          camera={frameCamera ?? ANY_CAMERA}
+          advice={frameShown.advice}
+          taken={framesOn(state, frameShown.rollId)
+            .filter((saved) => saved.id !== frameShown.id)
+            .map((saved) => saved.number)}
+          draft={record}
+          onChange={setRecord}
+          onBack={back}
+          editing={{ number: frameShown.number }}
+          unsaved={JSON.stringify(record) !== JSON.stringify(original)}
+          onPhoto={(key) => setRecord((current) => current && { ...current, photo: key })}
+          onSave={() => {
+            const changed = toFrameDraft(record, frameShown.rollId, frameShown.advice, frameShown.answers, frameShown.hold);
+            if (!changed) return;
+            update((current) => editFrame(current, frameShown.id, { number: changed.number, set: changed.set, note: changed.note, photo: changed.photo }));
+            back();
+          }}
+        />
+      );
+    }
+
+    // Rolls. A roll that is gone, such as after deleting it, shows Rolls instead.
+    const rollShown = screen.name === "rollPage" || screen.name === "rollDetails" ? findRoll(state, screen.id) : null;
+
+    if (rollShown && screen.name === "rollPage") {
+      return withOffer(
+        <RollPage
+          key={screen.id}
+          state={state}
+          rollId={screen.id}
+          via={screen.via ?? "rolls"}
+          onBack={back}
+          onDetails={() => openDetails(screen.id)}
+          onFrame={(id) => go({ name: "frame", id })}
+          onAddFrame={() => startAddingFrame(screen.id)}
+        />,
+      );
+    }
+
+    if (rollShown && screen.name === "rollDetails") {
+      const id = screen.id;
+      return (
+        <RollDetails
+          key={id}
+          state={state}
+          rollId={id}
+          draft={roll}
+          onChange={setRoll}
+          dates={rollDates}
+          onDates={setRollDates}
+          onBack={back}
+          onDone={() => {
+            const film = draftRoll(roll);
+            if (!film) return;
+            const finishedOn = rollShown.finishedOn !== null && rollDates.finishedOn ? { finishedOn: rollDates.finishedOn } : {};
+            update((current) => editRoll(current, id, { ...film, loadedOn: rollDates.loadedOn, ...finishedOn }));
+            back();
+          }}
+          onFinish={() => {
+            update((current) => finishRoll(current, rollShown.cameraId));
+            setOfferNext(true);
+            back();
+          }}
+          onDelete={() => {
+            update((current) => deleteRoll(current, id));
+            // The roll's page is gone too: back to where it was opened from.
+            backBy(2);
+          }}
+        />
+      );
+    }
+
+    if (["rolls", "rollPage", "rollDetails", "frame", "frameEdit"].includes(screen.name)) {
+      return withOffer(
+        <RollsHome
+          state={state}
+          onBack={back}
+          onRoll={(id) => go({ name: "rollPage", id })}
+          onLoad={(cameraId) => {
+            const target = state.cameras.find((saved) => saved.id === cameraId);
+            if (target) startLoading(target);
+          }}
+        />,
+      );
+    }
+
+    if (screen.name === "settings") {
+      return (
+        <SettingsHome
+          state={state}
+          onBack={back}
+          onHold={(hold) => update((current) => setHold(current, hold))}
+          theme={theme}
+          phoneTheme={phoneTheme()}
+          onTheme={pickTheme}
+          records={
+            <RecordsSection
+              lastBackup={lastBackup}
+              onSave={saveBackup}
+              onRead={readBackupFile}
+              onRestore={async (backup) => {
+                // The photos first, under their own keys, then the data that points to them.
+                await restoreBackupPhotos(backup);
+                update(() => backup.state);
+                setLastBackup(backup.savedAt.slice(0, 10));
+              }}
+            />
+          }
+        />
+      );
+    }
+
+    if (screen.name === "cameras" || screen.name === "camera" || screen.name === "film") {
+      return <CamerasHome state={state} onBack={back} onCamera={(id) => go({ name: "camera", id })} onAdd={startAdding} />;
+    }
+
+    // The shot's screens need the camera in use. Without one, such as after going Forward past a reset, show Home.
+    if (camera && screen.name === "roll") {
+      return (
+        <LoadRoll
+          cameraName={camera.name}
+          draft={roll}
+          onChange={setRoll}
+          onBack={back}
+          onLoad={() => {
+            const film = draftRoll(roll);
+            if (!film) return;
+            update((current) => loadRoll(current, camera.id, film));
+            restartAt({ name: "light" });
+          }}
+        />
+      );
+    }
+
+    if (shotCamera && screen.name === "light") {
+      return (
+        <LightStep
+          draft={shot}
+          onPick={(light) => setShot(pickLight(shot, light))}
+          onToggle={(key) => setShot(toggle(shot, key))}
+          onBack={back}
+          onNext={() => go({ name: "subject", ...along })}
+        />
+      );
+    }
+
+    if (shotCamera && screen.name === "subject") {
+      return (
+        <SubjectStep
+          draft={shot}
+          camera={shotCamera}
+          onChange={setShot}
+          onBack={back}
+          onNext={() => {
+            const answers = toAnswers(shot);
+            const conditions = answers && toConditions(answers, shotCamera, state.hold);
+            if (!answers || !conditions) return;
+            const result = recommend(conditions);
+            // A new result: nothing is recorded from it yet.
+            setLastRecorded(null);
+            // Home's last shot is the last one asked for now, not a frame added later.
+            if (!isRefusal(result) && addTo === null) {
+              const { aperture, shutter, bulbSeconds, focus } = result.final;
+              update((current) => setLastShot(current, { answers, result: { aperture, shutter, bulbSeconds, focus } }));
+            }
+            go({ name: "result", ...along });
+          }}
+        />
+      );
+    }
+
+    if (shotCamera && (screen.name === "result" || screen.name === "record")) {
+      const answers = toAnswers(shot);
+      const conditions = answers && toConditions(answers, shotCamera, state.hold);
+      const result = conditions && recommend(conditions);
+      const roll = shotCamera.film;
+      // The advice as given, kept with every frame recorded from it.
+      const advice = result && !isRefusal(result) ? { aperture: result.final.aperture, shutter: result.final.shutter, bulbSeconds: result.final.bulbSeconds, focus: result.final.focus } : null;
+
+      if (screen.name === "record" && answers && advice && roll && record) {
+        return (
+          <RecordShot
+            camera={shotCamera}
+            advice={advice}
+            taken={framesOn(state, roll.id).map((frame) => frame.number)}
+            draft={record}
+            onChange={setRecord}
+            onBack={back}
+            earlier={addTo !== null}
+            unsaved={record.note.trim() !== "" || record.photo !== (recordStart?.photo ?? null)}
+            samePhotoAs={record.photo && lastRecorded && record.photo === lastRecorded.photo ? lastRecorded.number : null}
+            onPhoto={(key) => {
+              clearInterruptedRecording();
+              setRecord((current) => current && { ...current, photo: key });
+            }}
+            // Kept for a shot recorded on the result, which picks up again on the result. A frame added from its
+            // roll is kept no more than a changed frame is: the phone mostly offers its photos then, not the camera.
+            onCameraOpen={addTo === null ? () => keepInterruptedRecording({ shot, record, recordStart, lastRecorded }) : undefined}
+            onSave={() => {
+              const frame = toFrameDraft(record, roll.id, advice, answers, state.hold);
+              if (!frame) return;
+              update((current) => recordFrame(current, frame).state);
+              // Added from the roll's page: back there, past the result and the two steps.
+              if (addTo !== null) return backBy(4);
+              setLastRecorded({ number: frame.number, photo: frame.photo });
+              back();
+            }}
+          />
+        );
+      }
+
+      if (answers && conditions && result) {
+        return (
+          <Result
+            camera={shotCamera}
+            hold={state.hold}
+            answers={answers}
+            conditions={conditions}
+            result={result}
+            // From a frame being added too: a new shot, with the camera in use, adding nothing.
+            onNewShot={startShot}
+            onRecord={
+              advice && roll
+                ? () => {
+                    // Another attempt starts with the last one's photo.
+                    const start = recordDraftFrom(advice, nextFrameNumber(state, roll.id), lastRecorded?.photo ?? null);
+                    setRecord(start);
+                    setRecordStart(start);
+                    go({ name: "record", ...along });
+                  }
+                : undefined
+            }
+            recordedFrame={lastRecorded?.number ?? null}
+          />
+        );
+      }
+    }
+
+    return (
+      <Home
+        state={state}
+        onStart={() => {
+          if (isSetUp(state)) return startShot();
+          setDraft(newDraft());
+          go({ name: "setup", step: "camera" });
+        }}
+        onFrame={(id) => go({ name: "frame", id })}
+      />
+    );
+  };
+
+  // Every screen but the forms has the menu: it names the camera in use and its roll, and opens the places.
+  return <MenuContext.Provider value={{ ...menuLines(state), onPick: openMenuItem }}>{screenFor()}</MenuContext.Provider>;
 }

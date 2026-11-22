@@ -61,11 +61,11 @@
     "id": "G57",
     "source": "ENGINE_SPEC section 7: focal length × framing height ÷ 24 mm, rounded to 0.1 m. The framing heights are estimates.",
     "rows": [
-      { "focalLengthMm": 28, "portrait": 0.7, "two_people": 1, "group": 2.8 },
-      { "focalLengthMm": 35, "portrait": 0.9, "two_people": 1.2, "group": 3.5 },
-      { "focalLengthMm": 40, "portrait": 1, "two_people": 1.4, "group": 4 },
-      { "focalLengthMm": 50, "portrait": 1.3, "two_people": 1.8, "group": 5 },
-      { "focalLengthMm": 58, "portrait": 1.5, "two_people": 2.1, "group": 5.8 }
+      { "focalLengthMm": 28, "portrait": 0.7, "two_people": 1, "group": 2.8, "far": 5.6 },
+      { "focalLengthMm": 35, "portrait": 0.9, "two_people": 1.2, "group": 3.5, "far": 7 },
+      { "focalLengthMm": 40, "portrait": 1, "two_people": 1.4, "group": 4, "far": 8 },
+      { "focalLengthMm": 50, "portrait": 1.3, "two_people": 1.8, "group": 5, "far": 10 },
+      { "focalLengthMm": 58, "portrait": 1.5, "two_people": 2.1, "group": 5.8, "far": 11.6 }
     ]
   },
   "cases": [
@@ -521,6 +521,10 @@
     { "id": "G70 by a window, storm outside, low sun, at 2 m", "input": { "light": { "kind": "indoors", "indoor": "window", "sky": "storm" }, "subject": "other", "subjectDistanceM": 2, "lowSun": true }, "expect": { "estimates": ["indoor", "storm_outside", "low_sun"], "estimate": true } },
     { "id": "G70 lamps ignore low sun", "input": { "light": { "kind": "indoors", "indoor": "lamps" }, "subject": "group", "lowSun": true }, "expect": { "estimates": ["indoor", "usual_distance"], "estimate": true } },
     { "id": "G70 street at night", "input": { "light": { "kind": "lowlight", "lowlight": "street_night" }, "subject": "landscape" }, "expect": { "estimates": ["evening"], "estimate": true } },
-    { "id": "G70 dusk", "input": { "light": { "kind": "lowlight", "lowlight": "dusk" }, "subject": "portrait" }, "expect": { "estimates": ["dusk", "usual_distance"], "estimate": true } }
+    { "id": "G70 dusk", "input": { "light": { "kind": "lowlight", "lowlight": "dusk" }, "subject": "portrait" }, "expect": { "estimates": ["dusk", "usual_distance"], "estimate": true } },
+
+    { "id": "G71 something further off: about 8 m, everything sharp", "input": { "light": { "kind": "daylight", "sky": "overcast", "scene": "open" }, "subject": "far", "support": "hand" }, "expect": { "final": { "aperture": "8", "shutter": "1/125", "focus": { "meters": 8, "source": "default" } }, "estimates": ["usual_distance"] } },
+    { "id": "G71 something further off may be people", "input": { "light": { "kind": "lowlight", "lowlight": "home_lamps" }, "subject": "far" }, "expect": { "warnings": [{ "code": "people_not_recommended" }] } },
+    { "id": "G71 no extra light for the sun behind something further off", "input": { "light": { "kind": "daylight", "sky": "sun", "scene": "open" }, "subject": "far", "sunBehindSubject": true }, "expect": { "final": { "aperture": "16", "shutter": "1/250" }, "warnings": [{ "code": "flare_risk" }] } }
   ]
 }

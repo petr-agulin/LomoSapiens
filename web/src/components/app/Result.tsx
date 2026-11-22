@@ -18,10 +18,9 @@ import {
 import type { SavedCamera, ShotAnswers } from "../../lib/store.ts";
 import { strings } from "../../lib/strings.ts";
 import { Icon, PathIcon } from "./icons.tsx";
-import { MenuSheet, type MenuItem } from "./MenuSheet.tsx";
-import { useMenuOnReturn } from "./navigation.ts";
+import { MenuButton } from "./MenuSheet.tsx";
 import { Pill } from "./Pill.tsx";
-import { MainButton, RoundButton, Screen, Sheet } from "./parts.tsx";
+import { MainButton, Screen, Sheet } from "./parts.tsx";
 import { Tags, shotTags } from "./ShotTags.tsx";
 
 const text = strings.app.result;
@@ -228,12 +227,9 @@ export function Result({
   answers,
   conditions,
   result,
-  onMenu,
   onNewShot,
   onRecord,
   recordedFrame = null,
-  rollLine = null,
-  inUseName = camera.name,
   openAt = null,
 }: {
   camera: SavedCamera;
@@ -241,22 +237,15 @@ export function Result({
   answers: ShotAnswers;
   conditions: Conditions;
   result: EngineResult;
-  onMenu: (item: MenuItem) => void;
   onNewShot: () => void;
   /** "Record this shot": left out when there are no settings or no roll to record on. */
   onRecord?: () => void;
   /** The frame last recorded from this result, if any. */
   recordedFrame?: number | null;
-  /** The roll in the camera in use, for the menu's Rolls row. */
-  rollLine?: string | null;
-  /** The camera in use, for the menu, when the advice is for another camera's roll. By default, `camera`. */
-  inUseName?: string;
   /** For the tests: a sheet open at once. */
   openAt?: "estimate" | "menu" | null;
 }) {
-  // Back from a place picked in the menu finds the menu open again.
-  const returning = useMenuOnReturn();
-  const [open, setOpen] = useState(returning ? "menu" : openAt);
+  const [open, setOpen] = useState(openAt === "estimate" ? openAt : null);
   const refused = isRefusal(result);
   const estimate = refused ? null : estimateExplained(conditions, result);
 
@@ -265,7 +254,9 @@ export function Result({
       top={
         <>
           <Pill camera={camera} hold={hold} />
-          <RoundButton icon="menu" label={strings.app.menu} onClick={() => setOpen("menu")} />
+          {/* The result is not one of the menu's places. The menu names the camera in use and its roll, also while
+              adding a frame to another camera's roll. */}
+          <MenuButton current={null} startOpen={openAt === "menu"} />
         </>
       }
       action={
@@ -335,18 +326,6 @@ export function Result({
           ))}
           <MainButton onClick={() => setOpen(null)}>{text.gotIt}</MainButton>
         </Sheet>
-      )}
-      {open === "menu" && (
-        <MenuSheet
-          current={null}
-          cameraName={inUseName}
-          rollLine={rollLine}
-          onClose={() => setOpen(null)}
-          onPick={(item) => {
-            setOpen(null);
-            onMenu(item);
-          }}
-        />
       )}
     </Screen>
   );

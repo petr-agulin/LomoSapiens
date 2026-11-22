@@ -39,11 +39,14 @@ export const PLACE_ICON: Record<Scene, string> = {
 };
 
 export const SUBJECT_ICON: Record<Subject, string> = {
-  portrait: "M12 4a3.6 3.6 0 1 1 0 7.2a3.6 3.6 0 1 1 0-7.2zM4.5 20.5c0-4 3.3-6.8 7.5-6.8s7.5 2.8 7.5 6.8",
-  two_people:
-    "M8.5 6a3 3 0 1 1 0 6a3 3 0 1 1 0-6zM16.2 7a2.6 2.6 0 1 1 0 5.2a2.6 2.6 0 1 1 0-5.2zM2.5 20.5c0-3.4 2.7-5.8 6-5.8s6 2.4 6 5.8M14.8 14.8c.5-.1.9-.2 1.4-.2 2.9 0 5.3 2.2 5.3 5.9",
-  group:
-    "M12 5a2.4 2.4 0 1 1 0 4.8a2.4 2.4 0 1 1 0-4.8zM5.5 8a2.1 2.1 0 1 1 0 4.2a2.1 2.1 0 1 1 0-4.2zM18.5 8a2.1 2.1 0 1 1 0 4.2a2.1 2.1 0 1 1 0-4.2zM7.5 20c0-2.8 2-4.8 4.5-4.8s4.5 2 4.5 4.8M1.8 18.5c0-2.2 1.6-3.8 3.7-3.8 1 0 1.8.3 2.5.8M22.2 18.5c0-2.2-1.6-3.8-3.7-3.8-1 0-1.8.3-2.5.8",
+  // People are a round head over a triangle body. Portrait: one, close.
+  portrait: "M12 3.5a3.3 3.3 0 1 1 0 6.6a3.3 3.3 0 1 1 0-6.6zM12 12.2l7 8.3H5z",
+  // Subject close by: two people side by side.
+  two_people: "M7.6 4.5a2.7 2.7 0 1 1 0 5.4a2.7 2.7 0 1 1 0-5.4zM7.6 11.8l4.2 8.7H3.4zM17.6 5.9a2.4 2.4 0 1 1 0 4.8a2.4 2.4 0 1 1 0-4.8zM17.6 12.6l3.8 7.9h-7.6z",
+  // Subject a few steps away: a whole person, head to toe, beside a tree.
+  group: "M2 21h20M15.5 3.5a4.7 4.7 0 1 1 0 9.4a4.7 4.7 0 1 1 0-9.4zM15.5 12.9V21M6.5 9.9a1.8 1.8 0 1 1 0 3.6a1.8 1.8 0 1 1 0-3.6zM6.5 15.2l3.1 5.8H3.4z",
+  // Something further off: a tall building's front, with its windows and door.
+  far: "M2 21h20M6.5 21V3.5h11V21M9.2 7h1.2M13.6 7h1.2M9.2 10.5h1.2M13.6 10.5h1.2M9.2 14h1.2M13.6 14h1.2M10.5 21v-3.3h3V21",
   landscape: "M2.5 19.5l6-9 4 5.5 3-4 6 7.5zM16.5 4a2 2 0 1 1 0 4a2 2 0 1 1 0-4z",
   other: "M3 15.5L15.5 3l5.5 5.5L8.5 21zM7 11.5l2 2M10 8.5l2 2M13 5.5l2 2",
 };

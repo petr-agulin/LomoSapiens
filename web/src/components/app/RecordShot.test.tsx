@@ -108,7 +108,7 @@ describe("the result's Record this shot", () => {
   const answers: ShotAnswers = { light: { group: "day", sky: "sun", place: "open" }, lowSun: false, stormOutside: false, subject: "portrait", distanceM: null, goal: "blur", sunBehind: false };
   const conditions = toConditions(answers, camera, "hand")!;
   const result = (more: { onRecord?: () => void; recordedFrame?: number | null } = {}) =>
-    readable(renderToStaticMarkup(<Result camera={camera} hold="hand" answers={answers} conditions={conditions} result={recommend(conditions)} onMenu={noop} onNewShot={noop} {...more} />));
+    readable(renderToStaticMarkup(<Result camera={camera} hold="hand" answers={answers} conditions={conditions} result={recommend(conditions)} onNewShot={noop} {...more} />));
 
   it("sits above Analyse a new shot", () => {
     inOrder(result({ onRecord: noop }), ["How the app got there", "Record this shot", "Analyse a new shot"]);
@@ -123,7 +123,7 @@ describe("the result's Record this shot", () => {
   it("isn't offered without a roll to record on, or without settings", () => {
     expect(result()).not.toContain("Record this shot");
     const refused = readable(
-      renderToStaticMarkup(<Result camera={camera} hold="hand" answers={answers} conditions={conditions} result={{ refused: "unsupported_lens" }} onMenu={noop} onNewShot={noop} onRecord={noop} />),
+      renderToStaticMarkup(<Result camera={camera} hold="hand" answers={answers} conditions={conditions} result={{ refused: "unsupported_lens" }} onNewShot={noop} onRecord={noop} />),
     );
     expect(refused).not.toContain("Record this shot");
   });

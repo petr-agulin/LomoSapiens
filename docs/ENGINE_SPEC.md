@@ -14,7 +14,7 @@ JSON Schema lives in `schema/conditions.schema.json`.
 |---|---|---|---|
 | `film` | `{ iso: number, type: "color_negative" \| "bw_negative" \| "slide" }` | yes | Only the speed changes the settings. Slide returns `unsupported_film` |
 | `light` | `{ kind: "daylight", sky, scene }`, `{ kind: "lowlight", lowlight }` or `{ kind: "indoors", indoor, sky? }` | yes | Enums below |
-| `subject` | `portrait` \| `two_people` \| `group` \| `landscape` \| `other` | yes | |
+| `subject` | `portrait` \| `two_people` \| `group` \| `far` \| `landscape` \| `other` | yes | The app names them Portrait, Subject close by, Subject a few steps away, Something further off, Landscape and Other |
 | `subjectDistanceM` | number above 0, or `null` | for `other` | Overrides the subject's usual distance |
 | `goal` | `blur` \| `sharp` \| `moving` | no | Default: portrait `blur`, every other subject `sharp`. There is no "no preference": every shot gets one of the three |
 | `lowSun` | boolean | no | Default `false`. Daylight only |
@@ -218,6 +218,7 @@ The heights are ESTIMATES, so `final.focus.source` is `default` and the app labe
 | `portrait` | 0.6 m: head and shoulders | 0.7 m | 0.9 m | 1 m | 1.3 m | 1.5 m |
 | `two_people` | 0.85 m | 1 m | 1.2 m | 1.4 m | 1.8 m | 2.1 m |
 | `group` | 2.4 m: people standing | 2.8 m | 3.5 m | 4 m | 5 m | 5.8 m |
+| `far` | 4.8 m: something small in the picture with a lot around it | 5.6 m | 7 m | 8 m | 10 m | 11.6 m |
 | `landscape` | See below | | | | | |
 
 `subjectDistanceM` overrides the usual distance, and `source` is `given`.
@@ -279,8 +280,8 @@ Warning text lives in `strings.ts`. Warnings never add facts beyond this spec an
 | `motion_blur_risk` | See section 6 | Fast movement may blur |
 | `focus_critical` | See section 7 | Measure the distance carefully |
 | `close_focus` | Focus below 1 m (section 7) | Check that your lens focuses this close |
-| `people_hold_still` | Subject is `portrait`, `two_people` or `group`, at 1/30, or at 1/60 in `street_night` | Everyone must hold still |
-| `people_not_recommended` | Subject is `portrait`, `two_people` or `group`, at 1/15 or slower, or on B | Not recommended for people |
+| `people_hold_still` | Subject is `portrait`, `two_people`, `group` or `far`, at 1/30, or at 1/60 in `street_night` | Everyone must hold still |
+| `people_not_recommended` | Subject is `portrait`, `two_people`, `group` or `far`, at 1/15 or slower, or on B | Not recommended for people |
 | `b_counted_seconds` | B is used | Hold the button for this many seconds |
 | `long_exposure` | B over 1 second | The exposure may need more time than calculated, so make test shots |
 
@@ -439,7 +440,7 @@ Unless stated: ISO 400 colour negative, the `compact` test camera, `support: nul
 
 | ID | Camera | Input | Expected |
 |---|---|---|---|
-| G57 | `compact` with each focal length | Usual distance at 28, 35, 40, 50, 58 mm, for `portrait`, `two_people`, `group` | The table in section 7 |
+| G57 | `compact` with each focal length | Usual distance at 28, 35, 40, 50, 58 mm, for `portrait`, `two_people`, `group`, `far` | The table in section 7 |
 | G58 | `compact` at 28 mm; at 35 mm | `portrait`, no distance; `two_people`, no distance | Focus 0.7 m, `default`, `close_focus`; focus 1.2 m, `default`, no `close_focus` |
 | G59 | `compact` | `group`: open, storm; snow or sand, sun in haze; snow or sand, overcast; under trees, sun behind clouds; under trees, overcast. Then open with sun, sun in haze, sun behind clouds and overcast | `light_estimate` and `estimate: true` on the first five; neither on the last four |
 | G60 | `compact` | `street_night`, `group`, ISO 160; ISO 320 | f/2.8, 1/30, braced; f/2.8, 1/60, hand |
@@ -453,6 +454,7 @@ Unless stated: ISO 400 colour negative, the `compact` test camera, `support: nul
 | G68 | `compact` | `portrait`, `sunBehindSubject`, `lowSun`, with `snow_sand` in `sun_haze`; then `storm` with `under_trees` and `snow_sand`, `group` | `snow_sand_not_sun`, `hazy_backlight`, `low_sun`, `usual_distance`; `storm`, `usual_distance` for both |
 | G69 | `compact` | `under_trees` in `sun_haze`, `portrait` at 2 m; `under_trees` in `sun`, `group` | `shade_not_sun` only; `usual_distance` only: Kodak covers open shade in sun |
 | G70 | `compact` | `window` with storm clouds outside and `lowSun`, `other` at 2 m; `lamps` with `lowSun`, `group`; `street_night`, `landscape`; `dusk`, `portrait` | `indoor`, `storm_outside`, `low_sun`; `indoor`, `usual_distance`; `evening`; `dusk`, `usual_distance` |
+| G71 | `compact` | `far`, open, overcast, no distance; `far`, `home_lamps`; `far`, open, sun, `sunBehindSubject` | Focus 8 m, `default`, `usual_distance`, f/8, 1/125: everything sharp, its usual goal; `people_not_recommended`; f/16, 1/250, the same as without the sun behind, as the extra light is for close subjects only, with `flare_risk` |
 
 ### 13.2 Kodak cross-check
 

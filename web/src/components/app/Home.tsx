@@ -1,11 +1,9 @@
 // Home: first launch, then the last recorded frame, or the roll waiting for one.
-import { useState } from "react";
 import { strings } from "../../lib/strings.ts";
-import { cameraInUse, isSetUp, lastRecordedFrame, recordedCount, type AppState } from "../../lib/store.ts";
+import { cameraInUse, isSetUp, lastRecordedFrame, type AppState } from "../../lib/store.ts";
 import { LastFrameCard, NoFrameCard } from "./LastShot.tsx";
-import { MenuSheet, type MenuItem } from "./MenuSheet.tsx";
-import { useMenuOnReturn } from "./navigation.ts";
-import { MainButton, RoundButton, Screen } from "./parts.tsx";
+import { MenuButton } from "./MenuSheet.tsx";
+import { MainButton, Screen } from "./parts.tsx";
 import { Pill } from "./Pill.tsx";
 
 const text = strings.app;
@@ -30,22 +28,17 @@ function SetupStep({ number, title, detail, first }: { number: number; title: st
 export function Home({
   state,
   onStart,
-  onMenu,
   onFrame = () => undefined,
   menuOpen = false,
 }: {
   state: AppState;
   /** "Set up camera and film" on first launch, "Analyse a new shot" afterwards. Theory is in the menu. */
   onStart: () => void;
-  onMenu: (item: MenuItem) => void;
   /** Opens a frame's page, from the last recorded frame's card. */
   onFrame?: (frameId: string) => void;
   /** For the tests: the menu open at once. */
   menuOpen?: boolean;
 }) {
-  // Back from a place picked in the menu finds the menu open again.
-  const returning = useMenuOnReturn();
-  const [menu, setMenu] = useState(menuOpen || returning);
   const firstLaunch = !isSetUp(state);
   const camera = cameraInUse(state);
   const last = lastRecordedFrame(state);
@@ -54,7 +47,7 @@ export function Home({
       top={
         <>
           {camera ? <Pill camera={camera} hold={state.hold} /> : <span className="flex-1" />}
-          <RoundButton icon="menu" label={text.menu} onClick={() => setMenu(true)} />
+          <MenuButton current="home" startOpen={menuOpen} />
         </>
       }
       action={<MainButton onClick={onStart}>{firstLaunch ? text.home.setUp : text.home.newShot}</MainButton>}
@@ -91,19 +84,6 @@ export function Home({
         ))}
 
       <span className="flex-[1_0_8px]" />
-
-      {menu && (
-        <MenuSheet
-          current="home"
-          cameraName={camera?.name ?? null}
-          rollLine={camera?.film ? strings.app.rolls.inUse(recordedCount(state, camera.film.id), camera.film.frames) : null}
-          onClose={() => setMenu(false)}
-          onPick={(item) => {
-            setMenu(false);
-            onMenu(item);
-          }}
-        />
-      )}
     </Screen>
   );
 }

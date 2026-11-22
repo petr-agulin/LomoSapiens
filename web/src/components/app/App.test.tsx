@@ -126,7 +126,7 @@ describe("Home on first launch", () => {
 describe("Home once a camera is set up, before the first shot", () => {
   const answers = { widestAperture: "2.8", smallestAperture: "22", focalLengthMm: "40", fastestShutter: "1/250", slowestShutter: "1/15", hasBulb: "yes" } as const;
   const { state } = addCamera(EMPTY_STATE, { name: "", answers, film: { iso: 400, type: "color_negative" } });
-  const home = (s = state) => readable(renderToStaticMarkup(<Home state={s} onStart={noop} onMenu={noop} />));
+  const home = (s = state) => readable(renderToStaticMarkup(<Home state={s} onStart={noop} />));
 
   it("drops the setup steps, and its main button starts a new shot", () => {
     const text = home();
@@ -136,7 +136,7 @@ describe("Home once a camera is set up, before the first shot", () => {
   });
 
   it("shows the pill: the camera's name, its film and how it's held, as plain words, not buttons", () => {
-    const page = renderToStaticMarkup(<Home state={state} onStart={noop} onMenu={noop} />);
+    const page = renderToStaticMarkup(<Home state={state} onStart={noop} />);
     expect(home()).toMatch(/My camera 400 colour By hand/);
     expect(page.match(/<button/g)).toHaveLength(2); // menu, Analyse a new shot
   });

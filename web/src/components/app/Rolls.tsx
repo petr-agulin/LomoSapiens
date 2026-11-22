@@ -80,7 +80,7 @@ export function RollsHome({
   const start = (camera: SavedCamera) => (camera.film ? setAsking({ finish: camera.id }) : onLoad(camera.id));
 
   return (
-    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack}>{strings.app.back}</Crumb>}>
+    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack} menu="rolls">{strings.app.back}</Crumb>}>
       <ScreenTitle title={text.title} line={text.line} />
       {state.cameras.length > 0 && <SectionLabel>{text.inCameras}</SectionLabel>}
       {loaded.map(({ roll, camera }) => (
@@ -183,7 +183,7 @@ export function RollPage({
   const count = recordedCount(state, rollId);
   const place = finishedOn ? `${cameraName} · ${rangeText(roll.loadedOn, finishedOn)}` : `${cameraName} · ${text.loaded(dayText(roll.loadedOn))}`;
   return (
-    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack}>{via === "camera" ? cameraName : text.title}</Crumb>}>
+    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack} menu>{via === "camera" ? cameraName : text.title}</Crumb>}>
       <ScreenTitle title={rollTitle(roll)} line={place} more={recordedText(count, roll.frames)} />
       <button type="button" onClick={onDetails} className="flex min-h-16 w-full cursor-pointer items-center gap-3 rounded-[var(--card-radius)] shadow-[var(--card-shadow)] bg-card py-2 pr-3.5 pl-4 text-left">
         <span className="flex-1 text-[17px] font-medium">{text.details}</span>

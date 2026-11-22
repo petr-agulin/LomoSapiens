@@ -206,7 +206,7 @@ export function FramePage({
     ) : undefined;
 
   return (
-    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack}>{rollTitle(found.roll)}</Crumb>} action={neighbours}>
+    <Screen top={<Crumb backLabel={strings.app.back} onBack={onBack} menu>{rollTitle(found.roll)}</Crumb>} action={neighbours}>
       <ScreenTitle title={text.title(frame.number)} line={momentText(frame.recordedAt)} />
       {/* The photo, to look at: adding, retaking or removing it is in "Change this frame". */}
       {frame.photo && (

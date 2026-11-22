@@ -73,7 +73,7 @@ const estimateLabel: Record<EstimateReason, string> = {
   indoor: "indoor light",
   evening: "twilight or night light",
   dusk: "dawn or dusk light",
-  hazy_backlight: "hazy sun behind the person",
+  hazy_backlight: "hazy sun behind your subject",
   storm_outside: "storm clouds outside",
   low_sun: "low sun",
   usual_distance: "usual distance",
@@ -87,13 +87,13 @@ const estimateWhy: Record<Exclude<EstimateReason, "usual_distance">, string> = {
   evening:
     "Twilight and night light varies and the published values are ranges, so the app uses the darker end. They are given for the evening, and the app uses them in the morning too: the light depends on how low the sun is.",
   dusk: "There is no published value for dawn or dusk, so the app uses its own.",
-  hazy_backlight: "The published extra light for sun behind the person is for full sun only, so the app uses its own value.",
+  hazy_backlight: "The published extra light for sun behind your subject is for full sun only, so the app uses its own value.",
   storm_outside: "The extra step for storm clouds outside is the app's own rule, not a published value.",
   low_sun: "The extra step for low sun is the app's own rule, not a published value.",
 };
 
 /** The subjects with a usual distance, as the estimate sentence names them. */
-const usualSubject = { portrait: "a portrait", two_people: "two people", group: "a group" } as const;
+const usualSubject = { portrait: "a portrait", two_people: "a subject close by", group: "a subject a few steps away", far: "something further off" } as const;
 
 const stepLabel: Record<StepKind, string> = {
   // Names the source, as Kodak's table gives one step more light than the Sunny 16 rule.
@@ -103,7 +103,7 @@ const stepLabel: Record<StepKind, string> = {
   dark_sky: "Storm clouds outside (estimate)",
   dusk_no_value: "No published value, so the widest aperture at the slowest shutter your support allows",
   shade: "In shade",
-  backlight: "Sun behind the person",
+  backlight: "Sun behind your subject",
   low_sun: "Low sun (estimate)",
   same_light_for_goal: "Same light, adjusted for your goal",
   same_light_for_support: "Same light, at a shutter your support allows",
@@ -393,10 +393,11 @@ export const strings = {
           sub: "Dark storm sky beyond the window",
           helper: "Turn this on when the sky outside is darker than ordinary heavy cloud, as before a storm.",
         },
+        // Kodak's extra light is for any close subject lit from behind, a person or a vase.
         sunBehind: {
-          label: "Sun behind the person",
-          sub: "You face the sun, the people have it at their backs",
-          helper: "Turn this on when the sun is behind the people you're photographing, so you're facing towards it.",
+          label: "Sun behind your subject",
+          sub: "You face the sun; it lights your subject from behind",
+          helper: "Turn this on when the sun is behind what you're photographing, so you're facing towards it.",
         },
       },
       fromLastShot: "On from your last shot",
@@ -405,13 +406,14 @@ export const strings = {
       subjectTitle: "What are you shooting?",
       subjectLine: (mm: number) => `Distances follow your ${mm} mm lens.`,
       youreShooting: "You're shooting",
-      changeSubjectLine: "Picking another subject resets the goal to its usual one.",
+      // Named by how much fills the picture, which sets the usual distance, so a vase fits as well as a person.
       subjects: {
-        portrait: { label: "Portrait", desc: "One person, head and shoulders" },
-        two_people: { label: "Two people", desc: "Head and shoulders" },
-        group: { label: "Group", desc: "Three or more, standing" },
-        landscape: { label: "Landscape", desc: "Views, distant buildings" },
-        other: { label: "Something else", desc: "You type the distance" },
+        portrait: { label: "Portrait", desc: "A person with head and shoulders, or a tight shot of any object" },
+        two_people: { label: "Subject close by", desc: "People waist up, a dog, a vase of flowers" },
+        group: { label: "Subject a few steps away", desc: "A person head to toe, a group, a whole car, a street door" },
+        far: { label: "Something further off", desc: "Small in the picture with a lot around it: a boat at the pier, a building façade" },
+        landscape: { label: "Landscape", desc: "Scenery, distant view" },
+        other: { label: "Other", desc: "You type the distance" },
       },
       about: (metres: string) => `About ${metres} m`,
       keepsInfinity: "Focus keeps ∞ sharp",
@@ -965,17 +967,19 @@ export const testPageStrings = {
     } satisfies Record<LowLight, string>,
     subject: {
       portrait: "Portrait",
-      two_people: "Two people",
-      group: "Group",
+      two_people: "Subject close by",
+      group: "Subject a few steps away",
+      far: "Something further off",
       landscape: "Landscape",
       other: "Other",
     } satisfies Record<Subject, string>,
     // The framing each usual distance is worked out for (ENGINE_SPEC section 7).
     subjectMeaning: {
-      portrait: "One person, head and shoulders",
-      two_people: "Head and shoulders",
-      group: "Three or more, standing",
-      landscape: "Views, distant buildings",
+      portrait: "A person with head and shoulders, or a tight shot of any object",
+      two_people: "People waist up, a dog, a vase of flowers",
+      group: "A person head to toe, a group, a whole car, a street door",
+      far: "Small in the picture with a lot around it",
+      landscape: "Scenery, distant view",
       other: "Anything else",
     } satisfies Record<Subject, string>,
     // The usual distances are estimates worked out from the user's lens, so they say "About".

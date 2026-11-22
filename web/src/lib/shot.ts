@@ -31,7 +31,7 @@ export const lowSunApplies = (light: LightChoice | null) => light?.group === "da
 /** Storm clouds outside: only the two indoor options lit by daylight. */
 export const stormApplies = (light: LightChoice | null) => daylightIndoors(light);
 
-/** Sun behind the person: a portrait or two people, with the sun in view. */
+/** Sun behind your subject: a portrait or a subject close by, with the sun in view. */
 export function sunBehindApplies(light: LightChoice | null, subject: Subject | null) {
   if (subject !== "portrait" && subject !== "two_people") return false;
   if (light?.group === "day") return light.sky === "sun" || light.sky === "sun_haze" || light.sky === "sun_behind_clouds";
@@ -64,7 +64,7 @@ export const toggle = (draft: ShotDraft, key: SwitchKey): ShotDraft => ({
   fromLast: { ...draft.fromLast, [key]: false },
 });
 
-/** Picking a subject resets the goal and the distance to its usual ones. Something else comes with its distance. */
+/** Picking a subject resets the goal and the distance to its usual ones. Other comes with its distance. */
 export const pickSubject = (draft: ShotDraft, subject: Subject, distanceM: number | null = null): ShotDraft => ({
   ...draft,
   subject,

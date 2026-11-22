@@ -207,7 +207,7 @@ The sun doesn't have to be in the picture. Shining on the lens from just outside
 
 In the shade, out of the sun, a bright sky in the picture or just beside it can cause slight flare too. Kodak's sheet for its professional films says it shows as smoky dark tones, and that more light helps against it, though the same sheet warns against a lot more. The app doesn't add any for it: keep the bright sky out of the picture where you can, with a darker background such as a hedge or a wall.
 
-With the sun behind the person, the face you photograph is turned away from it, lit only by the sky. Kodak's table gives a close subject lit from behind, such as a face, two steps more light than one lit from the front: f/5.6 instead of f/11, in bright sun at ISO 400 and 1/500. The app adds those two steps when you turn on Sun behind the person, for a portrait or two people, and the result warns of flare. In hazy sun the app adds one step, and with the sun behind clouds none, as there are no shadows; under an even grey sky it doesn't ask where the sun is. These are the app's own rules.
+With the sun behind the person, the face you photograph is turned away from it, lit only by the sky. Kodak's table gives a close subject lit from behind, such as a face, two steps more light than one lit from the front: f/5.6 instead of f/11, in bright sun at ISO 400 and 1/500. The app adds those two steps when you turn on Sun behind your subject, for a portrait or a subject close by, and the result warns of flare. In hazy sun the app adds one step, and with the sun behind clouds none, as there are no shadows; under an even grey sky it doesn't ask where the sun is. These are the app's own rules.
 
 ### In practice {#flare-in-practice}
 
@@ -432,7 +432,7 @@ Sources:
 
 Topic: Depth of field
 Teaser: Setting the distance, and pacing it out
-Picture: [|1|Portrait] [|1.4|Two people] [|4|Group] [|∞|Landscape]
+Picture: [|1|Portrait] [|1.4|Close by] [|4|A few steps] [|8|Further off] [|∞|Landscape]
 Caption: Usual distances in metres with a 40 mm lens, as on the subject step. For a landscape the app picks a mark that keeps ∞ sharp.
 Read next: sharp-zone, aperture
 
@@ -440,7 +440,7 @@ Many film cameras are focused by turning the lens to a distance mark. Get the di
 
 Pace it out: one walking step is about 0.75 m, and two steps about 1.5 m.
 
-The usual distances come from how much a lens takes in. A 35 mm frame is 24 mm tall, so at a distance d a lens of focal length f takes in a height of 24 × d ÷ f. Head and shoulders are about 0.6 m tall, which gives about 1 m with a 40 mm lens. The heights are the app's own estimates, so the result calls a usual distance an estimate. Type your own distance to replace it.
+The usual distances come from how much a lens takes in. A 35 mm frame is 24 mm tall, so at a distance d a lens of focal length f takes in a height of 24 × d ÷ f. Head and shoulders are about 0.6 m tall, which gives about 1 m with a 40 mm lens. A person head to toe, with some room around, is about 2.4 m, which gives 4 m. Something further off, small in a picture about 4.8 m tall, gives 8 m. The heights are the app's own estimates, so the result calls a usual distance an estimate. Type your own distance to replace it.
 
 The deeper the [sharp zone](#sharp-zone), the less the guess matters. With a 40 mm lens at f/16 focused at 5 m, everything from about 2 m to ∞ is sharp.
 
@@ -452,7 +452,8 @@ For a landscape, the app picks a distance mark that keeps ∞ sharp. Any mark fu
 |---|---|
 | Two walking steps | About 1.5 m |
 | 40 mm, portrait | About 1 m |
-| 40 mm, group | About 4 m |
+| 40 mm, a subject a few steps away | About 4 m |
+| 40 mm, something further off | About 8 m |
 | 40 mm, landscape at f/16 | 5 m |
 
 Sources:
@@ -460,7 +461,7 @@ Sources:
 - [Wikipedia, "135 film"](https://en.wikipedia.org/wiki/135_film): each frame is 24 × 36 mm.
 - Plain maths: the height a lens takes in, 24 × d ÷ f.
 - [Wikipedia, "Hyperfocal distance"](https://en.wikipedia.org/wiki/Hyperfocal_distance): the distance that keeps infinity sharp.
-- The app's own estimates: the heights of head and shoulders, two people and a group <!-- docs/ENGINE_SPEC.md, section 7 -->.
+- The app's own estimates: the heights of head and shoulders, people waist up, a person head to toe, and a picture with something further off <!-- docs/ENGINE_SPEC.md, section 7 -->.
 
 ## Freezing or blurring movement {#movement}
 

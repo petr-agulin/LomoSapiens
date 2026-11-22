@@ -42,7 +42,7 @@ export const SCENES: AnyScene[] = [
   "indoor_office",
 ];
 export const LOW_LIGHTS: LowLight[] = ["sun_low", "sun_just_set", "dusk", "street_night", "home_lamps", "floodlit"];
-export const SUBJECTS: Subject[] = ["portrait", "two_people", "group", "landscape", "other"];
+export const SUBJECTS: Subject[] = ["portrait", "two_people", "group", "far", "landscape", "other"];
 export const GOALS: Goal[] = ["blur", "sharp", "moving"];
 export const SUPPORTS: Support[] = ["hand", "braced", "surface"];
 export const FILM_TYPES: FilmType[] = ["color_negative", "bw_negative", "slide"];

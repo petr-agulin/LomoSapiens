@@ -559,7 +559,7 @@ const SKIES: Sky[] = ["sun", "sun_haze", "sun_behind_clouds", "overcast", "storm
 const SCENES: Scene[] = ["snow_sand", "open", "under_trees"];
 const EVENING: Exclude<LowLight, "home_lamps">[] = ["sun_low", "sun_just_set", "dusk", "street_night", "floodlit"];
 const INDOORS: IndoorLight[] = ["window", "room", "lamps", "office"];
-const SUBJECTS: Subject[] = ["portrait", "two_people", "group", "landscape", "other"];
+const SUBJECTS: Subject[] = ["portrait", "two_people", "group", "far", "landscape", "other"];
 const GOALS: Goal[] = ["blur", "sharp", "moving"];
 const FOCUS_SOURCES: Focus["source"][] = ["default", "given", "landscape"];
 

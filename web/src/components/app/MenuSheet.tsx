@@ -1,16 +1,61 @@
-// The menu, opened by the round button at the top right of Home and the result: the app's places, the same
-// list on every screen, with the one you're on marked. While it is open, a round ×
+// The menu, opened by the round button at the top right of every screen but the forms: the app's places, the
+// same list on every screen, with the one you're on marked. While it is open, a round ×
 // sits where the menu button was, so the button that opened it also closes it. Dragging its top down, a tap
 // outside, the phone's Back, Escape, or any row closes it too.
+import { createContext, useContext, useState } from "react";
 import { strings } from "../../lib/strings.ts";
+import { cameraInUse, recordedCount, type AppState } from "../../lib/store.ts";
 import { CARD_ICON, Icon, PathIcon } from "./icons.tsx";
 import { useDragToClose } from "./dragToClose.ts";
 import { useBackCloses } from "./navigation.ts";
-import { SCRIM, SHEET_FRAME, SheetHandle } from "./parts.tsx";
+import { RoundButton, SCRIM, SHEET_FRAME, SheetHandle } from "./parts.tsx";
 
 export type MenuItem = "home" | "cameras" | "rolls" | "theory" | "settings" | "about";
 
 const text = strings.app.menuItems;
+
+/** What every screen's menu shows and does: the camera in use, its roll, and opening a place. */
+export interface MenuPlaces {
+  cameraName: string | null;
+  rollLine: string | null;
+  onPick: (item: MenuItem) => void;
+}
+
+/** The camera in use, named under "Cameras", and its roll under "Rolls": "In use: 12 of 36 recorded". */
+export function menuLines(state: AppState): Pick<MenuPlaces, "cameraName" | "rollLine"> {
+  const camera = cameraInUse(state);
+  return { cameraName: camera?.name ?? null, rollLine: camera?.film ? strings.app.rolls.inUse(recordedCount(state, camera.film.id), camera.film.frames) : null };
+}
+
+/** Given once by the app, so a screen's menu button needs nothing passed down to it. */
+export const MenuContext = createContext<MenuPlaces>({ cameraName: null, rollLine: null, onPick: () => undefined });
+
+/**
+ * The round menu button at the top right of a screen, with its menu. `current` is the place this screen is, if
+ * it is one of the menu's places: a screen inside a place, such as a roll's page, isn't, and its place's row
+ * opens the place's own screen. `startOpen` is for the tests.
+ */
+export function MenuButton({ current, startOpen = false }: { current: MenuItem | null; startOpen?: boolean }) {
+  const [open, setOpen] = useState(startOpen);
+  const places = useContext(MenuContext);
+  return (
+    <>
+      <RoundButton icon="menu" label={strings.app.menu} onClick={() => setOpen(true)} />
+      {open && (
+        <MenuSheet
+          current={current}
+          cameraName={places.cameraName}
+          rollLine={places.rollLine}
+          onClose={() => setOpen(false)}
+          onPick={(item) => {
+            setOpen(false);
+            places.onPick(item);
+          }}
+        />
+      )}
+    </>
+  );
+}
 
 const ROWS: { item: MenuItem; icon: string }[] = [
   { item: "home", icon: "M3.5 11L12 4l8.5 7M6 9.5V20h12V9.5M10 20v-5h4v5" },

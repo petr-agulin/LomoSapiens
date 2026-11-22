@@ -6,6 +6,7 @@ import type { EngineResult, Support } from "../../lib/engine/types.ts";
 import { toConditions } from "../../lib/shot.ts";
 import { addCamera, EMPTY_STATE, finishRoll, recordFrame, setLastShot, type FrameDraft, type LightChoice, type SavedCamera, type ShotAnswers } from "../../lib/store.ts";
 import { Home } from "./Home.tsx";
+import { MenuContext, menuLines } from "./MenuSheet.tsx";
 import { Result } from "./Result.tsx";
 
 const readable = (html: string) =>
@@ -45,18 +46,11 @@ function page(
   { hold = "hand" as Support, saved = camera(), openAt = null as "estimate" | "menu" | null, result = undefined as EngineResult | undefined, rollLine = null as string | null } = {},
 ) {
   const conditions = toConditions(answers, saved, hold)!;
+  // The menu's camera and roll come from the app, as on every screen.
   return renderToStaticMarkup(
-    <Result
-      camera={saved}
-      hold={hold}
-      answers={answers}
-      conditions={conditions}
-      result={result ?? recommend(conditions)}
-      onMenu={noop}
-      onNewShot={noop}
-      rollLine={rollLine}
-      openAt={openAt}
-    />,
+    <MenuContext.Provider value={{ cameraName: saved.name, rollLine, onPick: noop }}>
+      <Result camera={saved} hold={hold} answers={answers} conditions={conditions} result={result ?? recommend(conditions)} onNewShot={noop} openAt={openAt} />
+    </MenuContext.Provider>,
   );
 }
 
@@ -137,7 +131,7 @@ describe("the result", () => {
 
   it("tags every switch that was on, and none its light hid", () => {
     const text = readable(page(shot({ group: "indoors", indoor: "window" }, { lowSun: true, stormOutside: true, subject: "group", goal: "sharp" })));
-    inOrder(text, ["Your shot", "By a window", "Low sun", "Storm clouds outside", "Group", "Everything sharp"]);
+    inOrder(text, ["Your shot", "By a window", "Low sun", "Storm clouds outside", "Subject a few steps away", "Everything sharp"]);
     const hidden = readable(page(shot({ group: "indoors", indoor: "lamps" }, { lowSun: true, stormOutside: true, subject: "group", goal: "sharp" })));
     expect(hidden).not.toContain("Low sun");
     expect(hidden).not.toContain("Storm clouds outside");
@@ -178,14 +172,19 @@ describe("Home's last recorded frame", () => {
     photo: null,
   });
   const recorded = recordFrame(recordFrame(withShot, frame("r1", 11), "2026-11-14T10:00").state, frame("r1", 12, "Anna by the window, second try"), "2026-11-14T10:05").state;
-  const home = (s = recorded, menuOpen = false) => renderToStaticMarkup(<Home state={s} onStart={noop} onMenu={noop} menuOpen={menuOpen} />);
+  const home = (s = recorded, menuOpen = false) =>
+    renderToStaticMarkup(
+      <MenuContext.Provider value={{ ...menuLines(s), onPick: noop }}>
+        <Home state={s} onStart={noop} menuOpen={menuOpen} />
+      </MenuContext.Provider>,
+    );
 
   it("shows the frame furthest along the roll on film, its tags, then its note, and Analyse a new shot", () => {
     inOrder(readable(home()), [
       "LomoSapiens",
       "Last recorded frame",
       "Frame 12 of 36", "f/", "5.6", "1/", "125", "3", "m", "ISO 400 colour",
-      "Sun", "Open terrain", "Group", "Everything sharp",
+      "Sun", "Open terrain", "Subject a few steps away", "Everything sharp",
       "Anna by the window, second try",
       "Analyse a new shot",
     ]);

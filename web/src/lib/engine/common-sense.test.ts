@@ -202,7 +202,8 @@ describe("common-sense rules from ENGINE_SPEC section 13.3", () => {
   }, 300_000);
 
   it("covers every combination of inputs, on every test camera", () => {
-    expect(combinations).toBe(118_784 * inputs.cameras.length);
+    // 29,696 for each of the five subjects in the inputs: Something further off made them five, from four.
+    expect(combinations).toBe(148_480 * inputs.cameras.length);
   });
 
   for (const rule of Object.keys(RULES) as Rule[]) {
