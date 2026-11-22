@@ -42,7 +42,7 @@ let state: AppState = addCamera(EMPTY_STATE, { name: "Mine", answers: compact, f
 state = recordFrame(state, frame(11, null), "2026-11-03T10:00").state;
 state = recordFrame(state, frame(12, "p-12"), "2026-11-03T10:10").state;
 
-const form = (more: Partial<RecordDraft> = {}, samePhotoAs: number | null = null, editing: { number: number } | null = null, earlier = false) =>
+const form = (more: Partial<RecordDraft> = {}, editing: { number: number } | null = null, earlier = false) =>
   renderToStaticMarkup(
     <RecordShot
       camera={state.cameras[0]}
@@ -52,7 +52,6 @@ const form = (more: Partial<RecordDraft> = {}, samePhotoAs: number | null = null
       onChange={noop}
       onBack={noop}
       onSave={noop}
-      samePhotoAs={samePhotoAs}
       editing={editing}
       earlier={earlier}
     />,
@@ -65,26 +64,24 @@ describe("the photo in the record form", () => {
     expect(html).toMatch(/<input type="file" accept="image\/\*" capture="environment" hidden=""/);
   });
 
-  it("shows the photo with Retake and Remove, and says when it's the last attempt's", () => {
-    const text = readable(form({ photo: "p-12" }, 12));
-    inOrder(text, ["As advised", "Same photo as frame 12", "Retake", "Remove", "Shot note (optional)"]);
+  it("shows the photo with Retake and Remove", () => {
+    const text = readable(form({ photo: "p-12" }));
+    inOrder(text, ["As advised", "Retake", "Remove", "Shot note (optional)"]);
     expect(text).not.toContain("Add a photo");
     expect(form({ photo: "p-12" })).toContain('aria-label="The scene, as photographed with the phone"');
-    expect(readable(form({ photo: "p-12" }))).not.toContain("Same photo as frame");
   });
 
   it("is in the form when changing a recorded frame, offering the camera or the phone's photos", () => {
-    const withPhoto = readable(form({ photo: "p-12" }, null, { number: 12 }));
+    const withPhoto = readable(form({ photo: "p-12" }, { number: 12 }));
     inOrder(withPhoto, ["Retake", "Remove", "Shot note", "Save changes"]);
-    expect(withPhoto).not.toContain("Same photo as frame");
-    const without = form({}, null, { number: 12 });
+    const without = form({}, { number: 12 });
     inOrder(readable(without), ["Add a photo", "Of the scene, from the camera or your photos. It stays on this phone.", "Save changes"]);
     expect(without).toMatch(/<input type="file" accept="image\/\*" hidden=""/);
     expect(without).not.toContain('capture="environment"');
   });
 
   it("offers the camera or the phone's photos for a frame taken earlier, added from its roll", () => {
-    const html = form({}, null, null, true);
+    const html = form({}, null, true);
     inOrder(readable(html), ["Record this shot", "Add a photo", "Of the scene, from the camera or your photos. It stays on this phone.", "Save frame 13"]);
     expect(html).not.toContain('capture="environment"');
   });

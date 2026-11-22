@@ -23,7 +23,7 @@ export interface RecordDraft {
   photo: string | null;
 }
 
-/** The form's start: the advice, the next frame number on the roll, and, for another attempt, the last one's photo. */
+/** The form's start, or a frame recorded straight from the result: the advice, the next frame number on the roll, and the photo just taken, if any. */
 export const recordDraftFrom = (advice: ShotSummary, number: number, photo: string | null = null): RecordDraft => ({
   number: String(number),
   aperture: advice.aperture,

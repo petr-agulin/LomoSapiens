@@ -513,7 +513,6 @@ export default function LomoApp() {
             onBack={back}
             earlier={addTo !== null}
             unsaved={record.note.trim() !== "" || record.photo !== (recordStart?.photo ?? null)}
-            samePhotoAs={record.photo && lastRecorded && record.photo === lastRecorded.photo ? lastRecorded.number : null}
             onPhoto={(key) => {
               clearInterruptedRecording();
               setRecord((current) => current && { ...current, photo: key });
@@ -524,10 +523,12 @@ export default function LomoApp() {
             onSave={() => {
               const frame = toFrameDraft(record, roll.id, advice, answers, state.hold);
               if (!frame) return;
-              update((current) => recordFrame(current, frame).state);
+              const recorded = recordFrame(state, frame);
+              if (!recorded.id) return;
+              update(() => recorded.state);
               // Added from the roll's page: back there, past the result and the two steps.
               if (addTo !== null) return backBy(4);
-              setLastRecorded({ number: frame.number, photo: frame.photo });
+              setLastRecorded({ id: recorded.id });
               back();
             }}
           />
@@ -535,6 +536,9 @@ export default function LomoApp() {
       }
 
       if (answers && conditions && result) {
+        // The frame recorded from this result, as it is now, so a number changed with "Change" shows changed.
+        const recordedNow = lastRecorded ? state.frames.find((frame) => frame.id === lastRecorded.id) : undefined;
+        const formStart = advice && roll ? (photo: string | null = null) => recordDraftFrom(advice, nextFrameNumber(state, roll.id), photo) : null;
         return (
           <Result
             camera={shotCamera}
@@ -545,17 +549,50 @@ export default function LomoApp() {
             // From a frame being added too: a new shot, with the camera in use, adding nothing.
             onNewShot={startShot}
             onRecord={
-              advice && roll
+              formStart
                 ? () => {
-                    // Another attempt starts with the last one's photo.
-                    const start = recordDraftFrom(advice, nextFrameNumber(state, roll.id), lastRecorded?.photo ?? null);
+                    clearInterruptedRecording();
+                    const start = formStart();
                     setRecord(start);
                     setRecordStart(start);
                     go({ name: "record", ...along });
                   }
                 : undefined
             }
-            recordedFrame={lastRecorded?.number ?? null}
+            // A new shot's frame is recorded with a photo, at once and as advised: "Change" fixes anything set
+            // otherwise. A frame added from its roll goes through the form, with an older photo from the phone.
+            onPhotoRecord={
+              formStart && addTo === null && advice && roll && answers
+                ? (photoKey) => {
+                    clearInterruptedRecording();
+                    const frame = toFrameDraft(formStart(photoKey), roll.id, advice, answers, state.hold);
+                    if (!frame) return;
+                    const recorded = recordFrame(state, frame);
+                    if (!recorded.id) return;
+                    update(() => recorded.state);
+                    setLastRecorded({ id: recorded.id });
+                  }
+                : undefined
+            }
+            // If the phone closes the page while its camera is open, the app opens again on the form, as after the
+            // form's own camera.
+            onCameraOpen={
+              formStart && addTo === null
+                ? () => {
+                    const start = formStart();
+                    keepInterruptedRecording({ shot, record: start, recordStart: start, lastRecorded });
+                  }
+                : undefined
+            }
+            recordedFrame={recordedNow?.number ?? null}
+            onChangeRecorded={
+              recordedNow
+                ? () => {
+                    setRecord(recordDraftOfFrame(recordedNow));
+                    go({ name: "frameEdit", id: recordedNow.id });
+                  }
+                : undefined
+            }
           />
         );
       }

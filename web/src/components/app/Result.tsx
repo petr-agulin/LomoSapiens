@@ -19,6 +19,7 @@ import type { SavedCamera, ShotAnswers } from "../../lib/store.ts";
 import { strings } from "../../lib/strings.ts";
 import { Icon, PathIcon } from "./icons.tsx";
 import { MenuButton } from "./MenuSheet.tsx";
+import { usePhotoPicker } from "./Photo.tsx";
 import { Pill } from "./Pill.tsx";
 import { MainButton, Screen, Sheet } from "./parts.tsx";
 import { Tags, shotTags } from "./ShotTags.tsx";
@@ -229,7 +230,10 @@ export function Result({
   result,
   onNewShot,
   onRecord,
+  onPhotoRecord,
+  onCameraOpen,
   recordedFrame = null,
+  onChangeRecorded,
   openAt = null,
 }: {
   camera: SavedCamera;
@@ -238,16 +242,38 @@ export function Result({
   conditions: Conditions;
   result: EngineResult;
   onNewShot: () => void;
-  /** "Record this shot": left out when there are no settings or no roll to record on. */
+  /** The record form. Left out, with the button, when there are no settings or no roll to record on. */
   onRecord?: () => void;
-  /** The frame last recorded from this result, if any. */
+  /**
+   * "Record this shot", with a photo: the phone's camera opens, and the photo taken records the frame at once, as advised.
+   * Closing the camera with no photo opens the form instead. Left out for a frame added from its roll's page,
+   * whose button opens the form.
+   */
+  onPhotoRecord?: (photoKey: string) => void;
+  /** Just before the camera opens, so the form can be kept if the phone closes the page meanwhile. */
+  onCameraOpen?: () => void;
+  /** The frame recorded from this result, if any, as numbered now. Once there is one, the button goes. */
   recordedFrame?: number | null;
+  /** "Change" beside it: the form for that frame. */
+  onChangeRecorded?: () => void;
   /** For the tests: a sheet open at once. */
   openAt?: "estimate" | "menu" | null;
 }) {
   const [open, setOpen] = useState(openAt === "estimate" ? openAt : null);
   const refused = isRefusal(result);
   const estimate = refused ? null : estimateExplained(conditions, result);
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const phoneCamera = usePhotoPicker({
+    camera: true,
+    onOpen: () => {
+      setPhotoFailed(false);
+      onCameraOpen?.();
+    },
+    onPicked: (key) => onPhotoRecord?.(key),
+    onFailed: () => setPhotoFailed(true),
+    onCancel: onRecord,
+  });
+  const record = strings.app.record;
 
   return (
     <Screen
@@ -261,17 +287,45 @@ export function Result({
       }
       action={
         <>
+          {/* Once recorded, the frame and a way to change it; another shot starts from "Analyse a new shot". */}
           {recordedFrame !== null && (
-            <p role="status" className="m-0 flex items-center justify-center gap-1.5 pb-2.5 text-[15px] font-medium">
-              <Icon name="check" size={16} />
-              {strings.app.record.recorded(recordedFrame)}
-            </p>
+            <div className="flex min-h-11 items-center justify-center gap-1.5 pb-1.5 text-[15px] font-medium">
+              <span role="status" className="flex items-center gap-1.5">
+                <Icon name="check" size={16} />
+                {record.recorded(recordedFrame)}
+              </span>
+              {onChangeRecorded && (
+                <>
+                  <span aria-hidden="true" className="text-muted">
+                    ·
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={record.changeSaid(recordedFrame)}
+                    onClick={onChangeRecorded}
+                    className="min-h-11 cursor-pointer px-1.5 font-semibold underline decoration-line underline-offset-4"
+                  >
+                    {record.change}
+                  </button>
+                </>
+              )}
+            </div>
           )}
-          {onRecord && !refused && (
-            <button type="button" onClick={onRecord} className="mb-2.5 min-h-[52px] cursor-pointer rounded-[18px] bg-[var(--page-button)] text-[17px] font-semibold text-ink shadow-[var(--page-button-shadow)]">
-              {recordedFrame === null ? strings.app.record.button : strings.app.record.another}
+          {onRecord && !refused && recordedFrame === null && (
+            <button
+              type="button"
+              onClick={onPhotoRecord ? phoneCamera.pick : onRecord}
+              className="mb-2.5 min-h-[52px] cursor-pointer rounded-[18px] bg-[var(--page-button)] text-[17px] font-semibold text-ink shadow-[var(--page-button-shadow)]"
+            >
+              {record.button}
             </button>
           )}
+          {photoFailed && recordedFrame === null && (
+            <p role="alert" className="m-0 px-1 pb-2.5 text-center text-sm text-warn-ink">
+              {strings.app.photo.failed}
+            </p>
+          )}
+          {onPhotoRecord && phoneCamera.field}
           <MainButton onClick={onNewShot}>{strings.app.home.newShot}</MainButton>
         </>
       }

@@ -547,9 +547,11 @@ export const strings = {
     },
     /** Recording a shot. */
     record: {
+      // On a new shot's result it opens the camera and records at once; for a frame added from its roll, the form.
       button: "Record this shot",
-      another: "Record another attempt",
       recorded: (number: number) => `Frame ${number} recorded`,
+      change: "Change",
+      changeSaid: (number: number) => `Change frame ${number}`,
       crumb: "For this shot",
       title: "Record this shot",
       line: "Change anything you set differently from the advice.",
@@ -681,7 +683,6 @@ export const strings = {
       addLaterLine: "Of the scene, from the camera or your photos. It stays on this phone.",
       retake: "Retake",
       remove: "Remove",
-      same: (number: number) => `Same photo as frame ${number}`,
       said: "The scene, as photographed with the phone",
       saidFrame: (number: number) => `Frame ${number}: the scene, as photographed with the phone`,
       failed: "This photo couldn't be kept. Try again, or record the frame without it.",

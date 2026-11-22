@@ -156,7 +156,6 @@ export function RecordShot({
   onBack,
   onSave,
   onPhoto = () => undefined,
-  samePhotoAs = null,
   onCameraOpen,
   editing = null,
   earlier = false,
@@ -174,8 +173,6 @@ export function RecordShot({
   onSave: () => void;
   /** A photo of the scene taken, as its key, or removed. */
   onPhoto?: (key: string | null) => void;
-  /** The frame whose photo this attempt starts with, if it does. */
-  samePhotoAs?: number | null;
   /** Just before the phone's camera opens, so the form can be kept if the phone closes the page meanwhile. */
   onCameraOpen?: () => void;
   /** Changing a recorded frame: its number as saved, for the title. */
@@ -271,7 +268,6 @@ export function RecordShot({
       {draft.photo ? (
         <section className="flex flex-col gap-2 rounded-[var(--card-radius)] shadow-[var(--card-shadow)] bg-card p-2.5">
           <PhotoView photoKey={draft.photo} label={photoText.said} className="max-h-[360px] w-full rounded-[14px] bg-chip object-contain" holder="aspect-[4/3] w-full rounded-[14px]" />
-          {samePhotoAs !== null && <p className="m-0 px-1 text-[13px] text-muted">{photoText.same(samePhotoAs)}</p>}
           <div className="flex gap-2">
             <button type="button" onClick={photo.pick} className="min-h-11 flex-1 cursor-pointer rounded-[14px] bg-chip font-semibold">
               {photoText.retake}

@@ -8,10 +8,9 @@ import type { RecordDraft } from "../../lib/record.ts";
 import type { ShotDraft } from "../../lib/shot.ts";
 import type { Frame } from "../../lib/store.ts";
 
-/** The frame last recorded from the result on screen, and its photo, for "Record another attempt". */
+/** The frame recorded from the result on screen, by its ID, which the result shows with "Change". */
 export interface LastRecorded {
-  number: number;
-  photo: string | null;
+  id: string;
 }
 
 export interface Interrupted {
@@ -49,7 +48,9 @@ export function readInterruptedRecording(): Interrupted | null {
     if (!text) return null;
     const saved = JSON.parse(text);
     if (typeof saved?.at !== "number" || Date.now() - saved.at > FRESH_MS || !saved.record || !saved.shot) return null;
-    return { shot: saved.shot, record: saved.record, recordStart: saved.recordStart ?? null, lastRecorded: saved.lastRecorded ?? null };
+    // A frame kept by an older version, by its number rather than its ID, is left out: the result then offers to record.
+    const lastRecorded = typeof saved.lastRecorded?.id === "string" ? { id: saved.lastRecorded.id } : null;
+    return { shot: saved.shot, record: saved.record, recordStart: saved.recordStart ?? null, lastRecorded };
   } catch {
     return null;
   }

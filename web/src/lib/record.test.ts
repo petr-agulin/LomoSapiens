@@ -24,7 +24,7 @@ describe("the record form's start", () => {
     expect(recordDraftFrom(advice, 12)).toEqual({ number: "12", aperture: "8", shutter: "1/125", bulbSeconds: null, focusM: 3, note: "", photo: null });
   });
 
-  it("starts another attempt with the last one's photo", () => {
+  it("takes the photo just taken, for a frame recorded straight from the result", () => {
     expect(recordDraftFrom(advice, 13, "p-1").photo).toBe("p-1");
     expect(toFrameDraft(recordDraftFrom(advice, 13, "p-1"), "r1", advice, answers, "hand")?.photo).toBe("p-1");
   });

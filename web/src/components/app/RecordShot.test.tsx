@@ -104,20 +104,30 @@ describe("the record form", () => {
   });
 });
 
-describe("the result's Record this shot", () => {
+describe("recording from the result", () => {
   const answers: ShotAnswers = { light: { group: "day", sky: "sun", place: "open" }, lowSun: false, stormOutside: false, subject: "portrait", distanceM: null, goal: "blur", sunBehind: false };
   const conditions = toConditions(answers, camera, "hand")!;
-  const result = (more: { onRecord?: () => void; recordedFrame?: number | null } = {}) =>
-    readable(renderToStaticMarkup(<Result camera={camera} hold="hand" answers={answers} conditions={conditions} result={recommend(conditions)} onNewShot={noop} {...more} />));
+  type More = { onRecord?: () => void; onPhotoRecord?: (key: string) => void; recordedFrame?: number | null; onChangeRecorded?: () => void };
+  const html = (more: More = {}) =>
+    renderToStaticMarkup(<Result camera={camera} hold="hand" answers={answers} conditions={conditions} result={recommend(conditions)} onNewShot={noop} {...more} />);
+  const result = (more: More = {}) => readable(html(more));
+  const withPhoto = { onRecord: noop, onPhotoRecord: noop };
 
-  it("sits above Analyse a new shot", () => {
-    inOrder(result({ onRecord: noop }), ["How the app got there", "Record this shot", "Analyse a new shot"]);
+  it("offers Record this shot above Analyse a new shot, opening the phone's camera straight away", () => {
+    inOrder(result(withPhoto), ["How the app got there", "Record this shot", "Analyse a new shot"]);
+    expect(html(withPhoto)).toMatch(/<input type="file" accept="image\/\*" capture="environment" hidden=""/);
   });
 
-  it("says which frame was recorded, and offers another attempt", () => {
-    const text = result({ onRecord: noop, recordedFrame: 12 });
-    inOrder(text, ["Frame 12 recorded", "Record another attempt", "Analyse a new shot"]);
-    expect(text).not.toContain("Record this shot");
+  it("opens the form, with no camera first, for a frame added from its roll", () => {
+    inOrder(result({ onRecord: noop }), ["How the app got there", "Record this shot", "Analyse a new shot"]);
+    expect(html({ onRecord: noop })).not.toContain('type="file"');
+  });
+
+  it("says which frame was recorded, with Change, and offers no second record: another shot starts anew", () => {
+    const text = result({ ...withPhoto, recordedFrame: 12, onChangeRecorded: noop });
+    inOrder(text, ["Frame 12 recorded", "·", "Change", "Analyse a new shot"]);
+    expect(text).not.toMatch(/Record this shot|another attempt/);
+    expect(html({ ...withPhoto, recordedFrame: 12, onChangeRecorded: noop })).toMatch(/aria-label="Change frame 12"[^>]*min-h-11/);
   });
 
   it("isn't offered without a roll to record on, or without settings", () => {
