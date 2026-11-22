@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import indexHtml from "../../../index.html?raw";
 import App from "../../App";
 import css from "../../index.css?raw";
 import { isTestPage, showsTestPage } from "../../lib/route.ts";
@@ -77,6 +78,13 @@ describe("on a computer: the phone frame", () => {
     // Everywhere else the note is hidden, and the app is the screen's size.
     expect(css).toMatch(/\.device-hint \{\s*display: none;\s*\}/);
     expect(css).toMatch(/--app-h: 100dvh;\s*--app-w: min\(100vw, 480px\);/);
+  });
+
+  it("doesn't zoom with two fingers or a double tap, while Chrome's Force enable zoom still can", () => {
+    const viewport = /<meta name="viewport" content="([^"]+)"/.exec(indexHtml)?.[1] ?? "";
+    expect(viewport.split(/,\s*/)).toEqual(expect.arrayContaining(["width=device-width", "initial-scale=1.0", "maximum-scale=1", "user-scalable=no"]));
+    // Blocking the gesture in the styles would override that setting too, for someone who needs to zoom.
+    expect(css).not.toMatch(/touch-action/);
   });
 });
 
